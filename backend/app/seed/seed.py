@@ -307,10 +307,10 @@ async def seed(*, force: bool = False):
 
         print("Seeding database with factual NEET protest data...")
 
-        # Clear all tables
+        # Clear all tables (child tables first to respect PostgreSQL FK constraints)
         for table in [
-            Article,
             Source,
+            Article,
             Event,
             Document,
             PublicReaction,
