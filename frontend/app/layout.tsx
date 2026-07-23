@@ -21,11 +21,10 @@ export const metadata: Metadata = {
     title: 'Straw Hat Press',
     description: 'Independent coverage of the NEET paper leak & Jantar Mantar protests.',
     type: 'website',
-    images: [{ url: '/luffy.png', width: 512, height: 512 }],
   },
   icons: {
     icon: '/luffy-bw.png',
-    apple: '/luffy.png',
+    apple: '/luffy-bw.png',
   },
 }
 
@@ -109,11 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </div>
             <div className="mt-10 border-t border-border pt-6">
-              <blockquote className="text-center text-sm italic text-muted max-w-2xl mx-auto leading-relaxed">
-                &ldquo;I don&apos;t want to conquer anything. I just think the guy with the most freedom in this world is the Pirate King.&rdquo;
-                <footer className="mt-1 not-italic text-xs text-gold">&mdash; Monkey D. Luffy</footer>
-              </blockquote>
-              <p className="mt-6 text-center text-xs text-muted">
+              <p className="text-center text-xs text-muted">
                 &copy; {new Date().getFullYear()} Straw Hat Press. An independent, non-partisan information platform.
               </p>
             </div>
@@ -123,3 +118,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+

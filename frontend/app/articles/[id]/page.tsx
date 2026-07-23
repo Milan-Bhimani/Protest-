@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { linkify } from '../../../lib/utils'
+import LuffySidePointerBadge from '../../../components/LuffySidePointerBadge'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -108,24 +109,27 @@ export default async function ArticlePage({
       </nav>
 
       <article>
-        {/* Category badges */}
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span
-            className="inline-flex items-center rounded-full bg-red/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            {article.type?.replace(/_/g, ' ')}
-          </span>
-          {article.category && (
-            <span className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-xs font-medium text-muted border border-border">
-              {article.category}
+        {/* Category badges & Luffy Pointer Badge */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="inline-flex items-center rounded-full bg-red/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              {article.type?.replace(/_/g, ' ')}
             </span>
-          )}
-          {article.perspective && article.perspective !== 'neutral' && (
-            <span className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-xs font-medium text-muted border border-border">
-              Perspective: {article.perspective}
-            </span>
-          )}
+            {article.category && (
+              <span className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-xs font-medium text-muted border border-border">
+                {article.category}
+              </span>
+            )}
+            {article.perspective && article.perspective !== 'neutral' && (
+              <span className="inline-flex items-center rounded-full bg-surface px-3 py-1 text-xs font-medium text-muted border border-border">
+                Perspective: {article.perspective}
+              </span>
+            )}
+          </div>
+          <LuffySidePointerBadge label="Luffy Points To Truth" />
         </div>
 
         {/* Title */}
