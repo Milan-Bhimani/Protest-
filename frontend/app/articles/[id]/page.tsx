@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { linkify } from '../../../lib/utils'
-import LuffySidePointerBadge from '../../../components/LuffySidePointerBadge'
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
@@ -129,7 +128,6 @@ export default async function ArticlePage({
               </span>
             )}
           </div>
-          <LuffySidePointerBadge label="Luffy Points To Truth" />
         </div>
 
         {/* Title */}
