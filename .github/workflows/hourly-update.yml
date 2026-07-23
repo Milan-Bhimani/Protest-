@@ -1,0 +1,27 @@
+name: Hourly News Update
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install httpx feedparser beautifulsoup4 lxml
+
+      - name: Run data update
+        run: python scripts/update_data.py
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          INGESTION_KEY: ${{ secrets.INGESTION_KEY }}
+          NEXTJS_URL: ${{ secrets.NEXTJS_URL }}
+          REVALIDATION_SECRET: ${{ secrets.REVALIDATION_SECRET }}

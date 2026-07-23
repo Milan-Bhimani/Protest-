@@ -1,0 +1,3 @@
+Requirement already satisfied: sqlalchemy in .\.venv\Lib\site-packages (2.0.31)
+Requirement already satisfied: aiosqlite in .\.venv\Lib\site-packages (0.22.1)
+Requirement already satisfied: typing-extensions>=4.6.0 in .\.venv\Lib\site-packages (from sqlalchemy) (4.16.0)

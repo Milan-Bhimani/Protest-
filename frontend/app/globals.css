@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-border: #E8D5A3;
+    --color-primary: #1A1A2E;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #D32F2F;
+    color: #FFFDF5;
+  }
+
+  :focus-visible {
+    outline: 2px solid #D32F2F;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+  /* ── Long-form article typography ─────────────────────────────── */
+  .prose-content {
+    max-width: 72ch;
+    line-height: 1.85;
+    font-size: 1.0625rem;
+    color: inherit;
+  }
+  .prose-content p {
+    margin-bottom: 1.5rem;
+  }
+  .prose-content p:first-of-type::first-letter {
+    font-family: var(--font-heading), sans-serif;
+    float: left;
+    font-size: 3.5rem;
+    line-height: 0.85;
+    margin-right: 0.15em;
+    margin-top: 0.05em;
+    color: #D32F2F;
+    font-weight: 700;
+  }
+  .prose-content a {
+    color: #1565C0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .prose-content a:hover {
+    color: #D32F2F;
+  }
+  .prose-content h2 {
+    font-family: var(--font-heading), sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-primary);
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D32F2F40;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #D32F2F80;
+  }
