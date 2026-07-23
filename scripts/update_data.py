@@ -46,17 +46,15 @@ async def main():
         return
 
     articles = parse_articles(items)
-    events = parse_events(items)
     reactions = parse_reactions(items)
 
     print("\n[2/4] Parsed data:")
     print(f"       Articles: {len(articles)}")
-    print(f"       Events:   {len(events)}")
     print(f"       Reactions: {len(reactions)}")
 
     payload = {
         "articles": articles,
-        "events": events,
+        "events": [],
         "reactions": reactions,
     }
 
@@ -82,7 +80,7 @@ async def main():
                 f"         Articles created: {result['articles_created']} (skipped {len(articles) - result['articles_created']} duplicates)"
             )
             print(
-                f"         Events created:   {result['events_created']} (skipped {len(events) - result['events_created']} duplicates)"
+                f"         Events created:   {result['events_created']} (events not auto-generated from RSS)"
             )
             print(
                 f"         Reactions created: {result['reactions_created']} (skipped {len(reactions) - result['reactions_created']} duplicates)"

@@ -295,13 +295,13 @@ The government's response has been reactive rather than proactive at every stage
 """
 
 
-async def seed():
+async def seed(*, force: bool = False):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
     async with AsyncSessionLocal() as db:
         existing = await db.execute(select(Article).limit(1))
-        if existing.scalar_one_or_none():
+        if existing.scalar_one_or_none() and not force:
             print("Data already seeded. Run scripts/reseed.py to force re-seed.")
             return
 
@@ -309,8 +309,15 @@ async def seed():
 
         # Clear all tables
         for table in [
-            Article, Source, Event, Document, PublicReaction,
-            StudentStory, FactCheck, NewsletterSubscriber, AuditLog,
+            Article,
+            Source,
+            Event,
+            Document,
+            PublicReaction,
+            StudentStory,
+            FactCheck,
+            NewsletterSubscriber,
+            AuditLog,
         ]:
             await db.execute(delete(table))
 
@@ -341,19 +348,31 @@ async def seed():
                 date=datetime(2026, 5, 3, tzinfo=timezone.utc),
                 title="NEET-UG 2026 Examination Conducted",
                 description="NEET-UG 2026 is held for 2.27 million aspirants across India. The NTA states the exam was conducted with GPS-tracked paper transport, AI-assisted CCTV, and 5G jammers. Within hours, students on social media begin reporting that chemistry questions appeared identical to a pre-circulated 'guess paper'.",
-                sources=["NTA official notification", "Student reports on r/JEENEETards", "r/indianmedschool Reddit threads"],
+                sources=[
+                    "NTA official notification",
+                    "Student reports on r/JEENEETards",
+                    "r/indianmedschool Reddit threads",
+                ],
             ),
             Event(
                 date=datetime(2026, 5, 8, tzinfo=timezone.utc),
                 title="NTA Refers Paper Leak Allegations to CBI",
                 description="After mounting social media reports and media investigations, the National Testing Agency refers the matter to the Central Bureau of Investigation for independent investigation. The NTA says it is committed to examination integrity. The referral is widely read as an implicit acknowledgment of irregularities.",
-                sources=["NTA official statement", "PIB press release", "The Hindu reporting"],
+                sources=[
+                    "NTA official statement",
+                    "PIB press release",
+                    "The Hindu reporting",
+                ],
             ),
             Event(
                 date=datetime(2026, 5, 12, tzinfo=timezone.utc),
                 title="NEET-UG 2026 Officially Cancelled",
                 description="The NTA officially cancels the May 3 examination. Education Minister Dharmendra Pradhan announces a re-examination will be held and promises action against those responsible. Over 2.27 million students who appeared must prepare to sit the exam again.",
-                sources=["NTA cancellation notice", "Dharmendra Pradhan statement", "All major national newspapers"],
+                sources=[
+                    "NTA cancellation notice",
+                    "Dharmendra Pradhan statement",
+                    "All major national newspapers",
+                ],
             ),
             Event(
                 date=datetime(2026, 5, 15, tzinfo=timezone.utc),
@@ -365,7 +384,11 @@ async def seed():
                 date=datetime(2026, 6, 6, tzinfo=timezone.utc),
                 title="First Major Student Protest at Jantar Mantar",
                 description="Students, parents, and youth from across India hold the first organized protest at Jantar Mantar, New Delhi, demanding accountability for the NEET-UG 2026 paper leak, resignation of Education Minister Pradhan, and compensation for families of students who died by suicide. A 16-year-old aspirant holding a Class 12 Chemistry textbook becomes one of the defining images. Multiple student organizations participate — including SFI, AISA, AISF, and others.",
-                sources=["Indian Express ground report", "The Hindu", "NDTV live coverage"],
+                sources=[
+                    "Indian Express ground report",
+                    "The Hindu",
+                    "NDTV live coverage",
+                ],
             ),
             Event(
                 date=datetime(2026, 6, 21, tzinfo=timezone.utc),
@@ -401,37 +424,68 @@ async def seed():
                 date=datetime(2026, 7, 19, tzinfo=timezone.utc),
                 title="Wangchuk Hospitalized; Delhi HC Orders Transfer to Medanta",
                 description="Delhi Police remove a visibly weakened Sonam Wangchuk from Jantar Mantar and take him to Safdarjung Hospital. His wife Gitanjali Angmo files a plea in the Delhi High Court. The court orders his immediate transfer to Medanta Hospital in Gurugram. Medanta confirms he is in the ICU but stable.",
-                sources=["Delhi HC order", "Medanta Hospital bulletin", "The Week", "Wion News"],
+                sources=[
+                    "Delhi HC order",
+                    "Medanta Hospital bulletin",
+                    "The Week",
+                    "Wion News",
+                ],
             ),
             Event(
                 date=datetime(2026, 7, 20, tzinfo=timezone.utc),
                 title="Sansad Chalo March — Lathi Charge and Tear Gas",
                 description="On the 45th day of protest and the first day of Parliament's Monsoon Session, thousands march from Jantar Mantar toward Parliament in the 'Sansad Chalo' procession. Delhi Police, citing Section 163 BNSS and refusal of march permission, use lathi charges and tear gas as protesters approach barricades near Shastri Bhawan and Raisina Road. Over 100 people are injured. Several metro stations are closed. Mobile internet is suspended in parts of Central Delhi. Delhi Police state 118 police personnel were also injured.",
-                sources=["The South First ground report by Kaushik Raj & Srishti Jaiswal", "Newslaundry", "NDTV live", "Rediff.com", "Hindustan Times", "SCBA statement"],
+                sources=[
+                    "The South First ground report by Kaushik Raj & Srishti Jaiswal",
+                    "Newslaundry",
+                    "NDTV live",
+                    "Rediff.com",
+                    "Hindustan Times",
+                    "SCBA statement",
+                ],
             ),
             Event(
                 date=datetime(2026, 7, 20, 18, 0, tzinfo=timezone.utc),
                 title="First Government Dialogue: CJP Meets JP Nadda for 10 Minutes",
                 description="For the first time in 45 days of protest, government opens a dialogue channel. Student organization spokespersons Saurav Das and Ashutosh Ranka meet Union Health Minister JP Nadda at his residence. The meeting lasts approximately 10 minutes. They submit a memorandum with three demands. Nadda says he will discuss internally but makes no commitments.",
-                sources=["Media India Group", "Livdose", "CJP spokesperson statement post-meeting"],
+                sources=[
+                    "Media India Group",
+                    "Livdose",
+                    "CJP spokesperson statement post-meeting",
+                ],
             ),
             Event(
                 date=datetime(2026, 7, 21, tzinfo=timezone.utc),
                 title="Rahul Gandhi and Priyanka Gandhi Removed from PM Residence Sit-In",
                 description="Congress leaders Rahul Gandhi and Priyanka Gandhi Vadra stage a sit-in outside PM Modi's residence on Lok Kalyan Marg, demanding government accountability for the NEET crisis. They are removed by police. Education Minister Pradhan calls it a 'political spectacle'. Parliament faces multiple adjournments as opposition demands NEET debate.",
-                sources=["India TV News", "Rahul Gandhi's X post", "Jagran Josh", "Hindustan Times"],
+                sources=[
+                    "India TV News",
+                    "Rahul Gandhi's X post",
+                    "Jagran Josh",
+                    "Hindustan Times",
+                ],
             ),
             Event(
                 date=datetime(2026, 7, 22, tzinfo=timezone.utc),
                 title="PM Modi Calls NEET Leak a 'Grave Sin'",
                 description="Parliamentary Affairs Minister Kiren Rijiju conveys to Parliament that PM Narendra Modi has called the NEET paper leak a 'ghor paap' (grave sin) and has assured strict action against those responsible. Modi emphasizes the issue 'should not be a matter of partisan politics.' Fast-track courts are announced. Protest continues; students say no concrete demand has been met.",
-                sources=["Kiren Rijiju press briefing", "Times Now", "Jagran Josh", "India Today"],
+                sources=[
+                    "Kiren Rijiju press briefing",
+                    "Times Now",
+                    "Jagran Josh",
+                    "India Today",
+                ],
             ),
             Event(
                 date=datetime(2026, 7, 23, tzinfo=timezone.utc),
                 title="Fast-Track Courts Announced; Ministers Visit Wangchuk",
                 description="PM Modi's government announces establishment of fast-track courts for examination paper leak cases. Union Ministers JP Nadda and Jitendra Singh visit Sonam Wangchuk at Medanta Hospital in Gurugram and reportedly assure him government will positively consider his demands. Wangchuk has not yet ended his fast pending written confirmation. Protest at Jantar Mantar continues.",
-                sources=["Times of India", "Business Standard", "Hindustan Times", "The Week"],
+                sources=[
+                    "Times of India",
+                    "Business Standard",
+                    "Hindustan Times",
+                    "The Week",
+                ],
             ),
         ]
         for e in events:
@@ -515,7 +569,7 @@ async def seed():
             ),
             StudentStory(
                 title='"The time you lose can never be returned"',
-                content='Suryaprakash Singh, a Master\'s student in Chemistry from Indore, took an overnight train to Delhi without telling his parents. He carried his Class 12 Chemistry NCERT textbook. "When a paper leak leads to an exam being cancelled, it isn\'t just an exam that is lost. Your time, your energy, your resources, your parents\' money — everything goes with it. The time you lose can never be returned." He said he was not affiliated with any student organization.',
+                content="Suryaprakash Singh, a Master's student in Chemistry from Indore, took an overnight train to Delhi without telling his parents. He carried his Class 12 Chemistry NCERT textbook. \"When a paper leak leads to an exam being cancelled, it isn't just an exam that is lost. Your time, your energy, your resources, your parents' money — everything goes with it. The time you lose can never be returned.\" He said he was not affiliated with any student organization.",
                 author_name="Suryaprakash Singh — Chemistry student, Indore",
                 status=StoryStatus.APPROVED,
             ),
@@ -527,7 +581,7 @@ async def seed():
             ),
             StudentStory(
                 title='"We aren\'t criminals. We are students."',
-                content='Nedhi, from Delhi, was at the July 20 Sansad Chalo march when police used lathi charges and tear gas. "We were sitting peacefully when they threw tear gas and beat us. We aren\'t criminals. We are students. I don\'t understand why they beat us." She was attending the protest for the third consecutive day.',
+                content="Nedhi, from Delhi, was at the July 20 Sansad Chalo march when police used lathi charges and tear gas. \"We were sitting peacefully when they threw tear gas and beat us. We aren't criminals. We are students. I don't understand why they beat us.\" She was attending the protest for the third consecutive day.",
                 author_name="Nedhi — student, Delhi",
                 status=StoryStatus.APPROVED,
             ),
@@ -557,7 +611,7 @@ async def seed():
             ),
             StudentStory(
                 title='"Every leak puts our future at stake, yet no one is accountable"',
-                content='Siddhanth Raj, 21, Philosophy student at Dayal Singh College, Delhi University, was at his first-ever protest on July 20. "It\'s not about one paper leak. Every leak puts our future at stake, yet no one is held accountable. How long are we supposed to keep enduring this?" He said he was inspired to come after seeing videos of Sonam Wangchuk\'s hunger strike.',
+                content="Siddhanth Raj, 21, Philosophy student at Dayal Singh College, Delhi University, was at his first-ever protest on July 20. \"It's not about one paper leak. Every leak puts our future at stake, yet no one is held accountable. How long are we supposed to keep enduring this?\" He said he was inspired to come after seeing videos of Sonam Wangchuk's hunger strike.",
                 author_name="Siddhanth Raj — Dayal Singh College, Delhi University",
                 status=StoryStatus.APPROVED,
             ),
@@ -639,10 +693,22 @@ async def seed():
                 is_published=True,
                 published_at=datetime(2026, 7, 22, tzinfo=timezone.utc),
                 sources=[
-                    {"title": "Wikipedia: 2026 NEET-UG paper leak", "url": "https://en.wikipedia.org/wiki/2026_NEET-UG_paper_leak"},
-                    {"title": "CBI arrests NEET kingpin — PIB", "url": "https://pib.gov.in/"},
-                    {"title": "The Hindu — NEET re-examination coverage", "url": "https://www.thehindu.com/"},
-                    {"title": "NDTV — NEET protest coverage", "url": "https://www.ndtv.com/"},
+                    {
+                        "title": "Wikipedia: 2026 NEET-UG paper leak",
+                        "url": "https://en.wikipedia.org/wiki/2026_NEET-UG_paper_leak",
+                    },
+                    {
+                        "title": "CBI arrests NEET kingpin — PIB",
+                        "url": "https://pib.gov.in/",
+                    },
+                    {
+                        "title": "The Hindu — NEET re-examination coverage",
+                        "url": "https://www.thehindu.com/",
+                    },
+                    {
+                        "title": "NDTV — NEET protest coverage",
+                        "url": "https://www.ndtv.com/",
+                    },
                 ],
             ),
             dict(
@@ -655,10 +721,22 @@ async def seed():
                 is_published=True,
                 published_at=datetime(2026, 7, 21, tzinfo=timezone.utc),
                 sources=[
-                    {"title": "The South First — Ground Report, July 20", "url": "https://www.thesouthfirst.com/"},
-                    {"title": "Newslaundry — Sansad Chalo coverage", "url": "https://www.newslaundry.com/"},
-                    {"title": "Rediff — Day after the violence", "url": "https://www.rediff.com/"},
-                    {"title": "SCBA statement on judicial inquiry", "url": "https://www.lawbeat.in/"},
+                    {
+                        "title": "The South First — Ground Report, July 20",
+                        "url": "https://www.thesouthfirst.com/",
+                    },
+                    {
+                        "title": "Newslaundry — Sansad Chalo coverage",
+                        "url": "https://www.newslaundry.com/",
+                    },
+                    {
+                        "title": "Rediff — Day after the violence",
+                        "url": "https://www.rediff.com/",
+                    },
+                    {
+                        "title": "SCBA statement on judicial inquiry",
+                        "url": "https://www.lawbeat.in/",
+                    },
                 ],
             ),
             dict(
@@ -671,10 +749,22 @@ async def seed():
                 is_published=True,
                 published_at=datetime(2026, 7, 22, tzinfo=timezone.utc),
                 sources=[
-                    {"title": "The Week — Wangchuk ICU update, July 23", "url": "https://www.theweek.in/"},
-                    {"title": "Delhi HC order re Medanta transfer", "url": "https://delhihighcourt.nic.in/"},
-                    {"title": "Medanta Hospital bulletin", "url": "https://www.medanta.org/"},
-                    {"title": "Wion News — Wangchuk health update", "url": "https://www.wionews.com/"},
+                    {
+                        "title": "The Week — Wangchuk ICU update, July 23",
+                        "url": "https://www.theweek.in/",
+                    },
+                    {
+                        "title": "Delhi HC order re Medanta transfer",
+                        "url": "https://delhihighcourt.nic.in/",
+                    },
+                    {
+                        "title": "Medanta Hospital bulletin",
+                        "url": "https://www.medanta.org/",
+                    },
+                    {
+                        "title": "Wion News — Wangchuk health update",
+                        "url": "https://www.wionews.com/",
+                    },
                 ],
             ),
             dict(
@@ -687,9 +777,18 @@ async def seed():
                 is_published=True,
                 published_at=datetime(2026, 7, 20, tzinfo=timezone.utc),
                 sources=[
-                    {"title": "The Hindu — 'At Jantar Mantar, hope refuses to leave' by Kulsoom Faiz", "url": "https://www.thehindu.com/"},
-                    {"title": "Indian Express — Student voices report", "url": "https://indianexpress.com/"},
-                    {"title": "The South First — Ground report by Kaushik Raj & Srishti Jaiswal", "url": "https://www.thesouthfirst.com/"},
+                    {
+                        "title": "The Hindu — 'At Jantar Mantar, hope refuses to leave' by Kulsoom Faiz",
+                        "url": "https://www.thehindu.com/",
+                    },
+                    {
+                        "title": "Indian Express — Student voices report",
+                        "url": "https://indianexpress.com/",
+                    },
+                    {
+                        "title": "The South First — Ground report by Kaushik Raj & Srishti Jaiswal",
+                        "url": "https://www.thesouthfirst.com/",
+                    },
                 ],
             ),
             dict(
@@ -704,9 +803,18 @@ async def seed():
                 sources=[
                     {"title": "NTA official statements", "url": "https://nta.ac.in/"},
                     {"title": "PIB — CBI press releases", "url": "https://pib.gov.in/"},
-                    {"title": "Kiren Rijiju parliamentary briefing", "url": "https://sansad.in/"},
-                    {"title": "Times Now — PM Modi NEET statement", "url": "https://www.timesnownews.com/"},
-                    {"title": "Business Standard — Fast-track courts", "url": "https://www.business-standard.com/"},
+                    {
+                        "title": "Kiren Rijiju parliamentary briefing",
+                        "url": "https://sansad.in/",
+                    },
+                    {
+                        "title": "Times Now — PM Modi NEET statement",
+                        "url": "https://www.timesnownews.com/",
+                    },
+                    {
+                        "title": "Business Standard — Fast-track courts",
+                        "url": "https://www.business-standard.com/",
+                    },
                 ],
             ),
         ]
@@ -731,31 +839,51 @@ async def seed():
                 claim="The NEET-UG 2026 question paper was leaked before the examination",
                 status=FactCheckStatus.TRUE,
                 evidence="Confirmed by CBI investigation, NTA's own decision to cancel the exam, PM Modi's 'grave sin' remark, and court remand documents showing 111 of 132 handwritten chemistry questions matched the NTA master set.",
-                sources=["CBI remand application", "PM Modi via Kiren Rijiju", "Wikipedia: 2026 NEET-UG paper leak"],
+                sources=[
+                    "CBI remand application",
+                    "PM Modi via Kiren Rijiju",
+                    "Wikipedia: 2026 NEET-UG paper leak",
+                ],
             ),
             FactCheck(
                 claim="The NEET-UG 2026 original exam was officially cancelled",
                 status=FactCheckStatus.TRUE,
                 evidence="The NTA officially cancelled the May 3, 2026, examination on May 12, 2026, and conducted a re-examination on June 21, 2026. This is documented in NTA's official notifications.",
-                sources=["NTA cancellation notification May 12, 2026", "NTA re-exam notification"],
+                sources=[
+                    "NTA cancellation notification May 12, 2026",
+                    "NTA re-exam notification",
+                ],
             ),
             FactCheck(
                 claim="At least 11-14 NEET aspirants died by suicide following the 2026 paper leak",
                 status=FactCheckStatus.TRUE,
                 evidence="Reports from The Hindu, Media India Group, and regional media cite 11-14 NEET aspirants who died by suicide in the weeks following the paper leak and exam cancellation. Some names reported: Pradeep Meghwal (Rajasthan), Ritik Mishra (UP), Anshika Pandey (Delhi), Anukeerthana (Coimbatore), Sanchita Sahu (Odisha). Exact figures are subject to ongoing verification as families and police records are still being documented.",
-                sources=["The Hindu ground report", "Media India Group investigation", "Regional news reports"],
+                sources=[
+                    "The Hindu ground report",
+                    "Media India Group investigation",
+                    "Regional news reports",
+                ],
             ),
             FactCheck(
                 claim="Police used lathi charges and tear gas on July 20, 2026",
                 status=FactCheckStatus.TRUE,
                 evidence="Confirmed by multiple journalists on the ground (The South First, Newslaundry, Rediff, Hindustan Times). Video footage and photographs circulated widely. The Supreme Court Bar Association called for a judicial inquiry, implicitly confirming the event. Delhi Police confirmed 118 of their personnel were also injured.",
-                sources=["The South First ground report", "Newslaundry", "SCBA statement", "Delhi Police press statement"],
+                sources=[
+                    "The South First ground report",
+                    "Newslaundry",
+                    "SCBA statement",
+                    "Delhi Police press statement",
+                ],
             ),
             FactCheck(
                 claim="The NEET-UG 2026 re-examination results showed over 2.7 lakh absentees",
                 status=FactCheckStatus.TRUE,
                 evidence="The NTA and The Hindu both reported that over 2.7 lakh eligible candidates did not appear for the June 21 re-examination — the highest absentee count for a re-examination in NTA history.",
-                sources=["The Hindu", "NTA announcement", "Wikipedia: 2026 NEET-UG paper leak"],
+                sources=[
+                    "The Hindu",
+                    "NTA announcement",
+                    "Wikipedia: 2026 NEET-UG paper leak",
+                ],
             ),
             FactCheck(
                 claim="Sonam Wangchuk was involuntarily removed from Jantar Mantar by Delhi Police",
@@ -767,7 +895,12 @@ async def seed():
                 claim="The student protest at Jantar Mantar is a Congress-organized political event",
                 status=FactCheckStatus.FALSE,
                 evidence="Ground reporting by The Hindu, Indian Express, and The South First consistently found students at Jantar Mantar asserting no party affiliation. The protest was organized by student-led groups including the CJP, SFI, AISA, AISF, and unaffiliated students. Congress leaders expressed solidarity after the protest was already underway, but did not organize it.",
-                sources=["The Hindu interviews", "Indian Express ground report", "The South First", "CJP founder statement"],
+                sources=[
+                    "The Hindu interviews",
+                    "Indian Express ground report",
+                    "The South First",
+                    "CJP founder statement",
+                ],
             ),
         ]
         for fc in fact_checks:
