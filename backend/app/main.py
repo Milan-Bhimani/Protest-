@@ -8,6 +8,7 @@ from app.routers import public_router, admin_router
 from app.routers.revalidate import router as revalidate_router
 from app.routers.ingest import router as ingest_router
 from app.auth import ensure_admin_exists
+from app.seed.seed import seed
 
 settings = get_settings()
 
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     async with AsyncSessionLocal() as db:
         await ensure_admin_exists(db)
+        await seed()
     yield
 
 
