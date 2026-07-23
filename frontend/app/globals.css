@@ -38,20 +38,21 @@
 
   /* ── Long-form article typography ─────────────────────────────── */
   .prose-content {
-    max-width: 72ch;
+    max-width: 75ch;
     line-height: 1.85;
-    font-size: 1.0625rem;
-    color: inherit;
+    font-size: 1.125rem;
+    color: #1A1A2E;
   }
   .prose-content p {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
+    word-break: break-word;
   }
   .prose-content p:first-of-type::first-letter {
     font-family: var(--font-heading), sans-serif;
     float: left;
-    font-size: 3.5rem;
-    line-height: 0.85;
-    margin-right: 0.15em;
+    font-size: 3.75rem;
+    line-height: 0.8;
+    margin-right: 0.25em;
     margin-top: 0.05em;
     color: #D32F2F;
     font-weight: 700;
@@ -59,24 +60,48 @@
   .prose-content a {
     color: #1565C0;
     text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+    transition: color 0.15s ease;
   }
   .prose-content a:hover {
     color: #D32F2F;
   }
   .prose-content h2 {
     font-family: var(--font-heading), sans-serif;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 2.5rem;
-    margin-bottom: 0.75rem;
-    padding-top: 1.5rem;
+    letter-spacing: 0.04em;
+    margin-top: 2.75rem;
+    margin-bottom: 1rem;
+    padding-top: 1.75rem;
     border-top: 1px solid var(--color-border);
     color: var(--color-primary);
   }
+  .prose-content blockquote {
+    border-left: 4px solid #D32F2F;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 1rem 1.25rem;
+    margin: 1.75rem 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-style: italic;
+    color: #555;
+  }
+  .prose-content ul, .prose-content ol {
+    margin-bottom: 1.75rem;
+    padding-left: 1.5rem;
+  }
+  .prose-content ul {
+    list-style-type: disc;
+  }
+  .prose-content ol {
+    list-style-type: decimal;
+  }
+  .prose-content li {
+    margin-bottom: 0.5rem;
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -90,3 +115,4 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #D32F2F80;
   }
+

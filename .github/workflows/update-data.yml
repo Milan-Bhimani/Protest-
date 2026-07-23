@@ -1,0 +1,36 @@
+name: Scheduled Data Update Cron
+
+on:
+  schedule:
+    # Run every 6 hours at minute 0 (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-news-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Data Update Script
+        env:
+          PYTHONPATH: backend
+          BACKEND_URL: ${{ secrets.BACKEND_URL || 'http://localhost:8000' }}
+          INGESTION_KEY: ${{ secrets.INGESTION_KEY || 'dev-ingest-key' }}
+          NEXTJS_URL: ${{ secrets.NEXTJS_URL || 'http://localhost:3000' }}
+          REVALIDATION_SECRET: ${{ secrets.REVALIDATION_SECRET || 'dev-revalidation-secret' }}
+        run: |
+          python scripts/update_data.py

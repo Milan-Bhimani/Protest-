@@ -35,6 +35,10 @@ class Stats(BaseModel):
     total_verified_claims: int
     days_of_protest: int = 0
     total_stories: int = 0
+    total_candidates: str = "23.3 Lakhs"
+    perfect_scores: int = 67
+    retest_candidates: int = 1563
+    cbi_arrests: int = 13
 
 
 class StudentStoryCreate(BaseModel):

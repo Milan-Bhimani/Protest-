@@ -106,7 +106,7 @@ async def main():
                 },
             )
             if resp.status_code == 200:
-                print("       Revalidation triggered ✓")
+                print("       Revalidation triggered OK")
             else:
                 print(
                     f"       Revalidation skipped: {resp.status_code} (frontend may not be running)"

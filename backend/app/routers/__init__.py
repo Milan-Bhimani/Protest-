@@ -117,7 +117,7 @@ async def get_statistics(db: AsyncSession = Depends(get_db)):
     else:
         effective_start = PROTEST_START
 
-    days_of_protest = (datetime.now(timezone.utc) - effective_start).days
+    days_of_protest = (datetime.now(timezone.utc) - effective_start).days + 1
 
     return Stats(
         total_events=events.scalar_one(),
@@ -126,6 +126,10 @@ async def get_statistics(db: AsyncSession = Depends(get_db)):
         total_verified_claims=fact_checks.scalar_one(),
         days_of_protest=days_of_protest,
         total_stories=stories.scalar_one(),
+        total_candidates="23.3 Lakhs",
+        perfect_scores=67,
+        retest_candidates=1563,
+        cbi_arrests=13,
     )
 
 

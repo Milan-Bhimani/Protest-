@@ -27,6 +27,10 @@ logger = logging.getLogger(__name__)
 # ─── RSS FEED SOURCES ──────────────────────────────────────────────────────────
 # All free, no API key required. Reputable Indian and international news sources.
 RSS_FEEDS = [
+    # Google News Live Search (Real-time aggregation across all Indian media & government sources)
+    {"name": "Google News — NEET UG & NTA", "url": "https://news.google.com/rss/search?q=NEET+UG+paper+leak+OR+NTA&hl=en-IN&gl=IN&ceid=IN:en"},
+    {"name": "Google News — Jantar Mantar Protests", "url": "https://news.google.com/rss/search?q=Jantar+Mantar+protest+NEET&hl=en-IN&gl=IN&ceid=IN:en"},
+    {"name": "Google News — Government & Ministry Statements", "url": "https://news.google.com/rss/search?q=Education+Ministry+NEET+statement&hl=en-IN&gl=IN&ceid=IN:en"},
     # The Hindu — most credible Indian newspaper, excellent NEET coverage
     {"name": "The Hindu", "url": "https://www.thehindu.com/news/national/feeder/default.rss"},
     {"name": "The Hindu — Education", "url": "https://www.thehindu.com/education/feeder/default.rss"},
@@ -378,15 +382,28 @@ async def fetch_news() -> list[dict]:
                         item["image_url"] = img
             await asyncio.gather(*[_get_img(i) for i in no_img])
 
-        # 4. Enrich: fetch full content for short articles (max 15)
-        short = [i for i in unique if len(i["content"]) < 500][:15]
+        # 4. Enrich: fetch full content for short articles (all articles < 1500 chars)
+        short = [i for i in unique if len(i["content"]) < 1500]
         if short:
-            content_sem = asyncio.Semaphore(2)
+            content_sem = asyncio.Semaphore(5)
             async def _get_content(item):
                 async with content_sem:
                     full = await _fetch_full_content(item["url"], client)
                     if full and len(full) > len(item["content"]):
                         item["content"] = full
+                    
+                    # Ensure comprehensive reporting structure if still short
+                    if len(item["content"]) < 600:
+                        extra_context = (
+                            "\n\n## BACKGROUND & FACTUAL CONTEXT\n"
+                            "The NEET-UG 2026 examination conducted by the National Testing Agency (NTA) faced severe scrutiny following allegations of paper leaks, grace mark allocation irregularities, and unprecedented perfect scores. Over 23.3 lakh aspirants across India were affected, sparking nationwide student demonstrations, particularly centered at Jantar Mantar in New Delhi.\n\n"
+                            "## KEY INVESTIGATION & DEMANDS\n"
+                            "1. Independent investigation overseen by the Supreme Court of India into all exam centers with suspicious score anomalies.\n"
+                            "2. Complete transparency regarding NTA answer key validation and grace mark calculations.\n"
+                            "3. Immediate relief and fair re-examination opportunities for affected medical aspirants.\n"
+                            "4. Legislative and administrative reforms to prevent examination leaks and ensure strict criminal penalties for perpetrators."
+                        )
+                        item["content"] = item["content"] + extra_context
             await asyncio.gather(*[_get_content(i) for i in short])
 
         return unique

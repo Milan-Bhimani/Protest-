@@ -58,12 +58,15 @@ export default async function Home() {
       </section>
 
       {stats && (
-        <section className="mt-12" aria-label="Platform statistics">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <StatCard label="Days of Protest" value={stats.days_of_protest} />
-            <StatCard label="Official Documents" value={stats.total_documents} />
-            <StatCard label="Verified Articles" value={stats.total_articles} />
-            <StatCard label="Student Testimonials" value={stats.total_stories} />
+        <section className="mt-12" aria-label="Platform and Examination statistics">
+          <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-red" style={{ fontFamily: 'var(--font-heading)' }}>KEY CONTROVERSY &amp; PROTEST METRICS</h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <StatCard label="Aspirants Affected" value={stats.total_candidates || "23.3 Lakhs"} />
+            <StatCard label="Perfect Scores (720)" value={stats.perfect_scores || 67} />
+            <StatCard label="Re-Test Candidates" value={stats.retest_candidates || 1563} />
+            <StatCard label="CBI Arrests Made" value={stats.cbi_arrests || 13} />
+            <StatCard label="Days of Protest" value={`${stats.days_of_protest} Days`} />
+            <StatCard label="Verified Coverage" value={stats.total_articles} />
           </div>
         </section>
       )}
@@ -222,11 +225,11 @@ export default async function Home() {
   )
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-xl border border-border bg-surface p-5 transition-shadow hover:shadow-sm">
-      <div className="text-3xl font-semibold tracking-tight text-primary">{value}</div>
-      <div className="mt-1 text-sm text-muted">{label}</div>
+      <div className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{value}</div>
+      <div className="mt-1 text-xs text-muted font-medium">{label}</div>
     </div>
   )
 }

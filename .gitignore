@@ -2,10 +2,6 @@ node_modules/
 .next/
 out/
 
-.env
-.env.local
-.env.production
-
 backend/.venv/
 backend/__pycache__/
 backend/**/__pycache__/
@@ -20,3 +16,21 @@ Thumbs.db
 
 frontend/out/
 frontend/.next/
+
+# Database files
+*.db
+backend/data/
+
+# Log files
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+*.tsbuildinfo
+
+# Local env overrides
+.env
+.env.*

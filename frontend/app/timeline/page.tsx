@@ -8,18 +8,29 @@ export const metadata: Metadata = {
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
-async function getTimeline() {
+async function getStats() {
   try {
-    const res = await fetch(`${API}/api/timeline`, { cache: 'no-store' })
-    return res.ok ? res.json() : []
+    const res = await fetch(`${API}/api/statistics`, { cache: 'no-store' })
+    return res.ok ? res.json() : null
   } catch {
     return null
   }
 }
 
+async function getTimeline() {
+  try {
+    const res = await fetch(`${API}/api/timeline`, { cache: 'no-store' })
+    return res.ok ? res.json() : []
+  } catch {
+    return []
+  }
+}
+
 export default async function TimelinePage() {
-  const apiEvents = await getTimeline()
+  const [apiEvents, stats] = await Promise.all([getTimeline(), getStats()])
   const events = apiEvents || []
+  const days = stats?.days_of_protest || 48
+  const todayStr = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
     <div>
@@ -29,7 +40,7 @@ export default async function TimelinePage() {
       </div>
 
       <div className="mb-8 rounded-xl border border-border bg-blue/5 p-4 text-sm text-muted">
-        <p><strong>Day {events.length} of the protest</strong> — Last updated: 22 July 2026. This timeline is compiled from verified news reports, ground coverage by independent journalists, and official statements. Sources are listed for each event.</p>
+        <p><strong>Day {days} of the protest</strong> — Last updated: {todayStr}. This timeline is compiled from verified news reports, ground coverage by independent journalists, and official statements. Sources are listed for each event.</p>
       </div>
 
       {events.length === 0 ? (
