@@ -20,17 +20,8 @@ async function getStats() {
   }
 }
 
-async function getDocuments() {
-  try {
-    const res = await fetch(`${API}/api/documents`, { cache: 'no-store' })
-    return res.ok ? await res.json() : []
-  } catch {
-    return []
-  }
-}
-
 export default async function Home() {
-  const [articles, stats, documents] = await Promise.all([getArticles(), getStats(), getDocuments()])
+  const [articles, stats] = await Promise.all([getArticles(), getStats()])
   const featured = articles?.[0]
   const latest = articles?.slice(1, 4) || []
 
@@ -203,24 +194,7 @@ export default async function Home() {
         </section>
       )}
 
-      <section className="mt-16 rounded-2xl border border-border bg-surface p-8 sm:p-12">
-        <h2 className="text-2xl font-bold uppercase tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>STAY INFORMED</h2>
-        <p className="mt-2 text-sm text-muted">Subscribe to receive verified updates about the NEET protest and examination reforms directly in your inbox.</p>
-        <form className="mt-6 flex max-w-md gap-3" action={`${API}/api/newsletter`} method="POST">
-          <label htmlFor="email-input" className="sr-only">Email address</label>
-          <input
-            id="email-input"
-            name="email"
-            type="email"
-            required
-            placeholder="your@email.com"
-            className="min-w-0 flex-1 rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-text placeholder:text-muted focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue"
-          />
-          <button type="submit" className="rounded-lg bg-red px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red/90" style={{ fontFamily: 'var(--font-heading)' }}>
-            Subscribe
-          </button>
-        </form>
-      </section>
+
     </div>
   )
 }
