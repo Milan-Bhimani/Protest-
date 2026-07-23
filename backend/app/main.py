@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     async with AsyncSessionLocal() as db:
         await ensure_admin_exists(db)
-        await seed(force=True)
+        await seed()
     yield
 
 
