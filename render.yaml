@@ -7,8 +7,22 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./data/platform.db
+        sync: false
       - key: SECRET_KEY
-        value: dev_secret_key_please_change_in_production
+        sync: false
       - key: INGESTION_API_KEY
-        value: dev-ingest-key
+        sync: false
+      - key: REVALIDATION_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@strawhatpress.in
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        value: '["https://strawhatpress.in", "https://www.strawhatpress.in"]'
+      - key: NEXTJS_URL
+        value: https://strawhatpress.in
+      - key: NEXTJS_REVALIDATION_URL
+        value: https://strawhatpress.in/api/revalidate
+      - key: PYTHON_VERSION
+        value: "3.11.9"

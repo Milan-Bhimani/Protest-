@@ -28,9 +28,9 @@ jobs:
       - name: Run Data Update Script
         env:
           PYTHONPATH: backend
-          BACKEND_URL: ${{ secrets.BACKEND_URL || 'http://localhost:8000' }}
-          INGESTION_KEY: ${{ secrets.INGESTION_KEY || 'dev-ingest-key' }}
-          NEXTJS_URL: ${{ secrets.NEXTJS_URL || 'http://localhost:3000' }}
-          REVALIDATION_SECRET: ${{ secrets.REVALIDATION_SECRET || 'dev-revalidation-secret' }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          INGESTION_KEY: ${{ secrets.INGESTION_KEY }}
+          NEXTJS_URL: ${{ secrets.NEXTJS_URL }}
+          REVALIDATION_SECRET: ${{ secrets.REVALIDATION_SECRET }}
         run: |
           python scripts/update_data.py
