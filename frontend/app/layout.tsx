@@ -44,6 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-red focus:px-4 focus:py-2 focus:text-white">
           Skip to main content
         </a>
+        <div className="border-b border-border bg-red/5 px-4 py-2 text-center text-xs text-muted leading-relaxed sm:text-sm">
+          &ldquo;Democracy has four pillars: <strong className="text-red">Youth</strong>, Media, Government, and Justice. But today, the youth fights for their rights while media and justice protect the government&rsquo;s mistakes.&rdquo; &mdash; Indian Constitution
+        </div>
         <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
           <div className="mx-auto flex max-w-content items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
             <a href="/" className="flex items-center gap-2.5 group">
