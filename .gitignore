@@ -34,3 +34,4 @@ backend/data/
 # Local env overrides
 .env
 .env.*
+.vercel
