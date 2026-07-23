@@ -4,16 +4,16 @@ import Image from 'next/image'
 export default function SideLuffyBanner() {
   return (
     <aside
-      aria-label="Luffy Figure"
-      className="hidden xl:block fixed bottom-6 right-6 z-30 w-52 sm:w-64 select-none pointer-events-none"
+      aria-label="Luffy pointing at news"
+      className="hidden lg:block fixed bottom-0 left-0 z-30 w-48 sm:w-56 select-none pointer-events-none"
     >
-      <div className="relative w-full aspect-[3/4]">
+      <div className="relative w-full aspect-[4/3]">
         <Image
-          src="/chatgpt_luffy_idol.png"
-          alt="Luffy"
+          src="/luffy_pointing_news.jpg"
+          alt="Luffy pointing at the news"
           fill
-          sizes="(max-width: 1280px) 0px, 256px"
-          className="object-contain"
+          sizes="(max-width: 1024px) 0px, 224px"
+          className="object-contain object-left-bottom"
           priority
         />
       </div>
