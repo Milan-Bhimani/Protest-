@@ -43,12 +43,12 @@ export default function MobileNav() {
 
       {open && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-50 flex sm:hidden">
-          <div className="fixed inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="relative ml-auto flex h-full w-64 flex-col bg-surface shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-4 py-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
+          <div className="relative ml-auto flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-2xl">
+            <div className="flex shrink-0 items-center justify-between border-b border-border bg-white px-4 py-3">
               <div className="flex items-center gap-2">
-                <StrawHatLogo className="w-7 h-7" />
-                <span className="text-sm font-bold tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>
+                <StrawHatLogo className="w-6 h-6" />
+                <span className="text-xs font-bold tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>
                   STRAW HAT PRESS
                 </span>
               </div>
@@ -58,14 +58,14 @@ export default function MobileNav() {
                 </svg>
               </button>
             </div>
-            <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Mobile navigation">
-              <ul className="space-y-1">
+            <nav className="flex-1 overflow-y-auto bg-white px-3 py-4" aria-label="Mobile navigation">
+              <ul className="space-y-0.5">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="block rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-widest text-muted transition-colors hover:bg-background hover:text-red"
+                      className="block rounded-lg px-3 py-2.5 text-xs font-bold uppercase tracking-widest text-muted transition-colors hover:bg-background hover:text-red"
                       style={{ fontFamily: 'var(--font-heading)' }}
                     >
                       {link.label}
@@ -74,8 +74,8 @@ export default function MobileNav() {
                 ))}
               </ul>
             </nav>
-            <div className="border-t border-border px-4 py-4">
-              <div className="flex flex-col gap-2">
+            <div className="shrink-0 border-t border-border bg-white px-4 py-3">
+              <div className="flex flex-row gap-3">
                 <a href="/faq" onClick={() => setOpen(false)} className="text-xs text-muted hover:text-red transition-colors">FAQ</a>
                 <a href="/about" onClick={() => setOpen(false)} className="text-xs text-muted hover:text-red transition-colors">About</a>
               </div>
