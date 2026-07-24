@@ -28,28 +28,67 @@ logger = logging.getLogger(__name__)
 # All free, no API key required. Reputable Indian and international news sources.
 RSS_FEEDS = [
     # Google News Live Search (Real-time aggregation across all Indian media & government sources)
-    {"name": "Google News — NEET UG & NTA", "url": "https://news.google.com/rss/search?q=NEET+UG+paper+leak+OR+NTA&hl=en-IN&gl=IN&ceid=IN:en"},
-    {"name": "Google News — Jantar Mantar Protests", "url": "https://news.google.com/rss/search?q=Jantar+Mantar+protest+NEET&hl=en-IN&gl=IN&ceid=IN:en"},
-    {"name": "Google News — Government & Ministry Statements", "url": "https://news.google.com/rss/search?q=Education+Ministry+NEET+statement&hl=en-IN&gl=IN&ceid=IN:en"},
-    {"name": "Google News — Supreme Court & CBI", "url": "https://news.google.com/rss/search?q=Supreme+Court+NEET+CBI&hl=en-IN&gl=IN&ceid=IN:en"},
-    {"name": "Google News — Sonam Wangchuk Protest", "url": "https://news.google.com/rss/search?q=Sonam+Wangchuk+protest&hl=en-IN&gl=IN&ceid=IN:en"},
+    {
+        "name": "Google News — NEET UG & NTA",
+        "url": "https://news.google.com/rss/search?q=NEET+UG+paper+leak+OR+NTA&hl=en-IN&gl=IN&ceid=IN:en",
+    },
+    {
+        "name": "Google News — Jantar Mantar Protests",
+        "url": "https://news.google.com/rss/search?q=Jantar+Mantar+protest+NEET&hl=en-IN&gl=IN&ceid=IN:en",
+    },
+    {
+        "name": "Google News — Government & Ministry Statements",
+        "url": "https://news.google.com/rss/search?q=Education+Ministry+NEET+statement&hl=en-IN&gl=IN&ceid=IN:en",
+    },
+    {
+        "name": "Google News — Supreme Court & CBI",
+        "url": "https://news.google.com/rss/search?q=Supreme+Court+NEET+CBI&hl=en-IN&gl=IN&ceid=IN:en",
+    },
+    {
+        "name": "Google News — Sonam Wangchuk Protest",
+        "url": "https://news.google.com/rss/search?q=Sonam+Wangchuk+protest&hl=en-IN&gl=IN&ceid=IN:en",
+    },
     # The Hindu — most credible Indian newspaper
-    {"name": "The Hindu — National", "url": "https://www.thehindu.com/news/national/feeder/default.rss"},
-    {"name": "The Hindu — Education", "url": "https://www.thehindu.com/education/feeder/default.rss"},
+    {
+        "name": "The Hindu — National",
+        "url": "https://www.thehindu.com/news/national/feeder/default.rss",
+    },
+    {
+        "name": "The Hindu — Education",
+        "url": "https://www.thehindu.com/education/feeder/default.rss",
+    },
     # Indian Express — strong investigative reporting
     {"name": "Indian Express", "url": "https://indianexpress.com/feed/"},
-    {"name": "Indian Express — Education", "url": "https://indianexpress.com/section/education/feed/"},
+    {
+        "name": "Indian Express — Education",
+        "url": "https://indianexpress.com/section/education/feed/",
+    },
     # NDTV — large reach
     {"name": "NDTV — India", "url": "https://feeds.feedburner.com/ndtvnews-india-news"},
     # Hindustan Times
-    {"name": "Hindustan Times", "url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml"},
-    {"name": "Hindustan Times — Education", "url": "https://www.hindustantimes.com/feeds/rss/education/rssfeed.xml"},
+    {
+        "name": "Hindustan Times",
+        "url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml",
+    },
+    {
+        "name": "Hindustan Times — Education",
+        "url": "https://www.hindustantimes.com/feeds/rss/education/rssfeed.xml",
+    },
     # Times of India
-    {"name": "Times of India — India", "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms"},
-    {"name": "Times of India — Education", "url": "https://timesofindia.indiatimes.com/rssfeeds/913168846.cms"},
+    {
+        "name": "Times of India — India",
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms",
+    },
+    {
+        "name": "Times of India — Education",
+        "url": "https://timesofindia.indiatimes.com/rssfeeds/913168846.cms",
+    },
     # Independent Outlets
     {"name": "The Print", "url": "https://theprint.in/feed/"},
-    {"name": "BBC News — India", "url": "https://feeds.bbci.co.uk/news/world/asia/india/rss.xml"},
+    {
+        "name": "BBC News — India",
+        "url": "https://feeds.bbci.co.uk/news/world/asia/india/rss.xml",
+    },
     {"name": "The Quint", "url": "https://www.thequint.com/rss/india"},
     {"name": "News18", "url": "https://www.news18.com/rss/india.xml"},
     {"name": "The Wire", "url": "https://thewire.in/rss"},
@@ -131,6 +170,7 @@ def _relevant(title: str, content: str) -> bool:
 
 # ─── IMAGE EXTRACTION ─────────────────────────────────────────────────────────
 
+
 def _extract_image(entry) -> str | None:
     """Extract image URL from RSS entry using multiple fallback strategies."""
     # 1. media:content
@@ -173,8 +213,12 @@ async def _fetch_og_image(url: str, client: httpx.AsyncClient) -> str | None:
     """Scrape Open Graph image from article page."""
     try:
         resp = await client.get(
-            url, timeout=8, follow_redirects=True,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0; +https://strawhatpress.in)"}
+            url,
+            timeout=8,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0; +https://strawhatpress.in)"
+            },
         )
         resp.raise_for_status()
         for pattern in [OG_IMAGE_RE, OG_IMAGE_RE2]:
@@ -219,11 +263,15 @@ def _extract_full_content(html: str, url: str) -> str | None:
     for selector in _ARTICLE_SELECTORS:
         container = soup.select_one(selector)
         if container:
-            for tag in container.find_all(["script", "style", "noscript", "iframe", "ins", "aside", "nav"]):
+            for tag in container.find_all(
+                ["script", "style", "noscript", "iframe", "ins", "aside", "nav"]
+            ):
                 tag.decompose()
             paragraphs = container.find_all("p")
             text = "\n\n".join(
-                p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 20
+                p.get_text(strip=True)
+                for p in paragraphs
+                if len(p.get_text(strip=True)) > 20
             )
             if len(text) > 200:
                 return text
@@ -239,8 +287,12 @@ async def _fetch_full_content(url: str, client: httpx.AsyncClient) -> str | None
     """Fetch and extract full article content from a URL."""
     try:
         resp = await client.get(
-            url, timeout=12, follow_redirects=True,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"}
+            url,
+            timeout=12,
+            follow_redirects=True,
+            headers={
+                "User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"
+            },
         )
         resp.raise_for_status()
         return _extract_full_content(resp.text, url)
@@ -250,7 +302,10 @@ async def _fetch_full_content(url: str, client: httpx.AsyncClient) -> str | None
 
 # ─── WIKIPEDIA FREE API ────────────────────────────────────────────────────────
 
-async def _fetch_wikipedia_summary(title: str, client: httpx.AsyncClient) -> dict | None:
+
+async def _fetch_wikipedia_summary(
+    title: str, client: httpx.AsyncClient
+) -> dict | None:
     """
     Fetch article summary from Wikipedia REST API (completely free, no key needed).
     Returns {"title", "summary", "image_url", "url"} or None.
@@ -258,8 +313,12 @@ async def _fetch_wikipedia_summary(title: str, client: httpx.AsyncClient) -> dic
     encoded = quote(title.replace(" ", "_"))
     url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}"
     try:
-        resp = await client.get(url, timeout=10, follow_redirects=True,
-                                headers={"User-Agent": "StudentProtestArchive/1.0 (info@strawhatpress.in)"})
+        resp = await client.get(
+            url,
+            timeout=10,
+            follow_redirects=True,
+            headers={"User-Agent": "StudentProtestArchive/1.0 (info@strawhatpress.in)"},
+        )
         if resp.status_code == 200:
             data = resp.json()
             return {
@@ -298,34 +357,47 @@ async def _fetch_rajmandal_news(client: httpx.AsyncClient) -> list[dict]:
                 r = await client.get(art_url, timeout=12)
                 if r.status_code != 200:
                     return None
-                
+
                 art_soup = BeautifulSoup(r.text, "lxml")
-                
+
                 headline = None
                 description = None
                 date_pub = None
-                
+
                 script_tag = art_soup.find("script", {"type": "application/ld+json"})
                 if script_tag and script_tag.string:
                     try:
                         import json
+
                         data = json.loads(script_tag.string)
                         headline = data.get("headline")
                         description = data.get("description")
                         date_pub = data.get("datePublished")
                     except Exception:
                         pass
-                
+
                 if not headline:
                     h1 = art_soup.find("h1")
-                    headline = h1.get_text(strip=True) if h1 else slug.replace("-", " ").title()
-                
+                    headline = (
+                        h1.get_text(strip=True)
+                        if h1
+                        else slug.replace("-", " ").title()
+                    )
+
                 ps = art_soup.find_all("p")
-                paragraphs = [p.get_text(strip=True) for p in ps if len(p.get_text(strip=True)) > 30]
-                content = "\n\n".join(paragraphs) if paragraphs else (description or headline)
+                paragraphs = [
+                    p.get_text(strip=True)
+                    for p in ps
+                    if len(p.get_text(strip=True)) > 30
+                ]
+                content = (
+                    "\n\n".join(paragraphs) if paragraphs else (description or headline)
+                )
 
                 og_img = art_soup.find("meta", property="og:image")
-                img_url = og_img["content"] if og_img and og_img.has_attr("content") else None
+                img_url = (
+                    og_img["content"] if og_img and og_img.has_attr("content") else None
+                )
 
                 if not date_pub:
                     date_pub = datetime.now(timezone.utc).isoformat()
@@ -343,6 +415,7 @@ async def _fetch_rajmandal_news(client: httpx.AsyncClient) -> list[dict]:
                 return None
 
         sem = asyncio.Semaphore(5)
+
         async def _bounded(slug):
             async with sem:
                 return await _fetch_article(slug)
@@ -358,6 +431,7 @@ async def _fetch_rajmandal_news(client: httpx.AsyncClient) -> list[dict]:
 
 # ─── MAIN FETCH FUNCTION ───────────────────────────────────────────────────────
 
+
 async def fetch_news() -> list[dict]:
     """
     Fetch all relevant news from therajmandal.in + RSS feeds + Wikipedia.
@@ -366,10 +440,10 @@ async def fetch_news() -> list[dict]:
     items = []
 
     async with httpx.AsyncClient(
-        timeout=20, follow_redirects=True,
-        headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"}
+        timeout=20,
+        follow_redirects=True,
+        headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"},
     ) as client:
-
         # 1. Fetch live news directly from therajmandal.in
         rajmandal_items = await _fetch_rajmandal_news(client)
         items.extend(rajmandal_items)
@@ -384,7 +458,9 @@ async def fetch_news() -> list[dict]:
                 for entry in parsed.entries[:20]:
                     title = entry.get("title", "").strip()
                     link = entry.get("link", "").strip()
-                    summary = entry.get("summary", "") or entry.get("description", "") or ""
+                    summary = (
+                        entry.get("summary", "") or entry.get("description", "") or ""
+                    )
                     published = entry.get("published_parsed")
                     pub_date = (
                         datetime(*published[:6], tzinfo=timezone.utc).isoformat()
@@ -394,20 +470,23 @@ async def fetch_news() -> list[dict]:
                     clean_summary = re.sub(r"<[^>]+>", "", summary).strip()
                     if not _relevant(title, clean_summary):
                         continue
-                    feed_items.append({
-                        "title": title[:500],
-                        "content": clean_summary,
-                        "url": link,
-                        "image_url": _extract_image(entry),
-                        "published_at": pub_date,
-                        "source": feed["name"],
-                    })
+                    feed_items.append(
+                        {
+                            "title": title[:500],
+                            "content": clean_summary,
+                            "url": link,
+                            "image_url": _extract_image(entry),
+                            "published_at": pub_date,
+                            "source": feed["name"],
+                        }
+                    )
             except Exception as e:
                 logger.warning("RSS feed failed [%s]: %s", feed["name"], e)
             return feed_items
 
         # Concurrent feed fetching with semaphore to be polite
         sem = asyncio.Semaphore(5)
+
         async def _bounded_fetch(feed):
             async with sem:
                 return await _fetch_feed(feed)
@@ -425,14 +504,16 @@ async def fetch_news() -> list[dict]:
         for topic in wiki_topics:
             wiki = await _fetch_wikipedia_summary(topic, client)
             if wiki and wiki["summary"] and len(wiki["summary"]) > 100:
-                items.append({
-                    "title": wiki["title"],
-                    "content": wiki["summary"],
-                    "url": wiki["url"],
-                    "image_url": wiki["image_url"],
-                    "published_at": datetime.now(timezone.utc).isoformat(),
-                    "source": "Wikipedia",
-                })
+                items.append(
+                    {
+                        "title": wiki["title"],
+                        "content": wiki["summary"],
+                        "url": wiki["url"],
+                        "image_url": wiki["image_url"],
+                        "published_at": datetime.now(timezone.utc).isoformat(),
+                        "source": "Wikipedia",
+                    }
+                )
 
         # Deduplicate by URL
         seen: set[str] = set()
@@ -449,23 +530,26 @@ async def fetch_news() -> list[dict]:
         no_img = [i for i in unique if not i["image_url"]][:20]
         if no_img:
             img_sem = asyncio.Semaphore(3)
+
             async def _get_img(item):
                 async with img_sem:
                     img = await _fetch_og_image(item["url"], client)
                     if img:
                         item["image_url"] = img
+
             await asyncio.gather(*[_get_img(i) for i in no_img])
 
         # 4. Enrich: fetch full content for short articles (all articles < 1500 chars)
         short = [i for i in unique if len(i["content"]) < 1500]
         if short:
             content_sem = asyncio.Semaphore(5)
+
             async def _get_content(item):
                 async with content_sem:
                     full = await _fetch_full_content(item["url"], client)
                     if full and len(full) > len(item["content"]):
                         item["content"] = full
-                    
+
                     # Ensure comprehensive reporting structure if still short
                     if len(item["content"]) < 600:
                         extra_context = (
@@ -478,6 +562,7 @@ async def fetch_news() -> list[dict]:
                             "4. Legislative and administrative reforms to prevent examination leaks and ensure strict criminal penalties for perpetrators."
                         )
                         item["content"] = item["content"] + extra_context
+
             await asyncio.gather(*[_get_content(i) for i in short])
 
         return unique
@@ -485,14 +570,46 @@ async def fetch_news() -> list[dict]:
 
 # ─── PARSE FUNCTIONS ──────────────────────────────────────────────────────────
 
+
 def _classify_type(title: str, content: str) -> str:
     """Classify article type based on content signals."""
     lower = f"{title} {content}".lower()
-    if any(kw in lower for kw in ["official statement", "government says", "minister", "pm modi", "court order", "cbi"]):
+    if any(
+        kw in lower
+        for kw in [
+            "official statement",
+            "government says",
+            "minister",
+            "pm modi",
+            "court order",
+            "cbi",
+        ]
+    ):
         return "official_statement"
-    if any(kw in lower for kw in ["analysis", "explains", "explainer", "what is", "why", "how", "investigation"]):
+    if any(
+        kw in lower
+        for kw in [
+            "analysis",
+            "explains",
+            "explainer",
+            "what is",
+            "why",
+            "how",
+            "investigation",
+        ]
+    ):
         return "analysis"
-    if any(kw in lower for kw in ["student says", "testimonial", "voice", "story", "my experience", "protester"]):
+    if any(
+        kw in lower
+        for kw in [
+            "student says",
+            "testimonial",
+            "voice",
+            "story",
+            "my experience",
+            "protester",
+        ]
+    ):
         return "community_voice"
     return "fact"
 
@@ -506,46 +623,78 @@ def parse_articles(items: list[dict]) -> list[dict]:
         if len(content) > 400:
             summary = summary.rsplit(" ", 1)[0] + "…"
 
-        articles.append({
-            "title": item["title"],
-            "content": content,
-            "slug": item["url"],          # URL is used as slug (unique identifier)
-            "summary": summary,
-            "image_url": item.get("image_url"),
-            "type": _classify_type(item["title"], content),
-            "category": item.get("source", "News"),
-            "is_published": True,
-            "published_at": item["published_at"],
-            "perspective": "neutral",     # We do not editorially classify perspective
-        })
+        articles.append(
+            {
+                "title": item["title"],
+                "content": content,
+                "slug": item["url"],  # URL is used as slug (unique identifier)
+                "summary": summary,
+                "image_url": item.get("image_url"),
+                "type": _classify_type(item["title"], content),
+                "category": item.get("source", "News"),
+                "is_published": True,
+                "published_at": item["published_at"],
+                "perspective": "neutral",  # We do not editorially classify perspective
+            }
+        )
     return articles
 
 
 def parse_events(items: list[dict]) -> list[dict]:
     """Extract timeline events from news items."""
     event_signals = [
-        "protest", "march", "lathi", "lathicharge", "lathi charge",
-        "arrest", "detained", "suicide", "hospital", "meeting",
-        "rally", "sit-in", "hunger strike", "hunger fast",
-        "sansad chalo", "chalo sansad", "Section 163",
-        "tear gas", "tear-gas", "crackdown", "supreme court",
-        "high court", "cbi", "nta", "verdict", "statement",
-        "re-exam", "counselling", "hearing", "parliament",
+        "protest",
+        "march",
+        "lathi",
+        "lathicharge",
+        "lathi charge",
+        "arrest",
+        "detained",
+        "suicide",
+        "hospital",
+        "meeting",
+        "rally",
+        "sit-in",
+        "hunger strike",
+        "hunger fast",
+        "sansad chalo",
+        "chalo sansad",
+        "Section 163",
+        "tear gas",
+        "tear-gas",
+        "crackdown",
+        "supreme court",
+        "high court",
+        "cbi",
+        "nta",
+        "verdict",
+        "statement",
+        "re-exam",
+        "counselling",
+        "hearing",
+        "parliament",
     ]
     events = []
     seen_titles: set[str] = set()
     for item in items:
+        source = item.get("source", "")
+        if source == "Wikipedia" or "## BACKGROUND & FACTUAL CONTEXT" in (
+            item.get("content") or ""
+        ):
+            continue
         text = f"{item['title']} {item['content']}".lower()
         if any(kw in text for kw in event_signals):
             title = item["title"][:500]
             if title not in seen_titles:
                 seen_titles.add(title)
-                events.append({
-                    "date": item["published_at"],
-                    "title": title,
-                    "description": (item["content"] or item["title"])[:2000],
-                    "sources": [item["url"]],
-                })
+                events.append(
+                    {
+                        "date": item["published_at"],
+                        "title": title,
+                        "description": (item["content"] or item["title"])[:2000],
+                        "sources": [item["url"]],
+                    }
+                )
     return events
 
 
@@ -599,6 +748,11 @@ def parse_reactions(items: list[dict]) -> list[dict]:
     reactions = []
     seen: set[tuple] = set()
     for item in items:
+        source = item.get("source", "")
+        if source == "Wikipedia" or "## BACKGROUND & FACTUAL CONTEXT" in (
+            item.get("content") or ""
+        ):
+            continue
         text = f"{item['title']} {item['content']}".lower()
         for keyword, display_name, category in reaction_map:
             if keyword in text:
@@ -608,13 +762,15 @@ def parse_reactions(items: list[dict]) -> list[dict]:
                     continue
                 seen.add(key)
                 content = item["content"] or item["title"]
-                reactions.append({
-                    "person_name": display_name,
-                    "category": category,
-                    "statement_summary": content[:800],
-                    "date": item["published_at"],
-                    "original_source": item["url"],
-                })
+                reactions.append(
+                    {
+                        "person_name": display_name,
+                        "category": category,
+                        "statement_summary": content[:800],
+                        "date": item["published_at"],
+                        "original_source": item["url"],
+                    }
+                )
                 break  # one reaction per item
 
     return reactions

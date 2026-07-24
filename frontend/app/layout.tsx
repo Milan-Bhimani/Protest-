@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="border-b border-border bg-red/5 px-4 py-2 text-center text-xs text-muted leading-relaxed sm:text-sm">
           &ldquo;Democracy has four pillars: <strong className="text-red">Youth</strong>, Media, Government, and Justice. But today, the youth fights for their rights while media and justice protect the government&rsquo;s mistakes.&rdquo; &mdash; Indian Constitution
         </div>
-        <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80">
+        <header className="sticky top-0 z-40 border-b border-border bg-surface/95">
           <div className="mx-auto flex max-w-content items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
             <a href="/" className="flex items-center gap-2.5 group">
               <StrawHatLogo className="w-9 h-9 transition-transform duration-200 group-hover:scale-110" />
