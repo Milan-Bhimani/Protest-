@@ -51,7 +51,7 @@ export default function MobileNav() {
 
       {open && mounted && createPortal(
         <div
-          className="fixed inset-0 z-[99999] flex w-full h-full flex-col bg-[#FFFDF5] md:hidden"
+          className="fixed inset-0 z-[100000] flex w-full h-full flex-col border-none bg-[#FFFDF5] shadow-2xl transition-transform duration-300"
           style={{
             position: 'fixed',
             top: 0,
@@ -62,7 +62,7 @@ export default function MobileNav() {
             height: '100vh',
             backgroundColor: '#FFFDF5',
             color: '#1A1A2E',
-            zIndex: 99999,
+            zIndex: 100000,
             display: 'flex',
             flexDirection: 'column',
           }}
