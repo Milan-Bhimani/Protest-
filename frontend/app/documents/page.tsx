@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Documents',
+  title: 'Verified Official Documents',
   description: 'Verified official documents, reports, government orders, court filings, and statements regarding the NEET-UG 2026 paper leak and Jantar Mantar protests.',
 }
 
@@ -23,55 +23,71 @@ export default async function DocumentsPage() {
   const documents = await getDocuments()
 
   return (
-    <div>
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold uppercase tracking-wide text-primary sm:text-4xl" style={{ fontFamily: 'var(--font-heading)' }}>OFFICIAL DOCUMENTS</h1>
-        <p className="mt-2 text-muted">Verified official documents including government orders, court filings, public notices, and verified reports related to the NEET-UG 2026 paper leak and Jantar Mantar protests.</p>
+    <div className="space-y-10">
+      {/* Header Banner */}
+      <div className="wanted-poster rounded-3xl p-8 sm:p-12 shadow-xl">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-red animate-pulse" />
+          <span className="text-xs font-black uppercase tracking-widest text-red" style={{ fontFamily: 'var(--font-heading)' }}>
+            PRIMARY EXHIBIT ARCHIVE
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wide text-[#2D2415]" style={{ fontFamily: 'var(--font-heading)' }}>
+          OFFICIAL DOCUMENTS &amp; COURT EXHIBITS
+        </h1>
+        <p className="mt-3 text-[#4A3F28] text-base sm:text-lg max-w-3xl leading-relaxed font-medium">
+          Verified government notifications, Supreme Court filings, NTA official releases, and CBI chargesheet extracts related to the NEET-UG 2026 investigation.
+        </p>
       </div>
 
       {documents.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-12 text-center">
-          <p className="text-muted">No documents available yet. Documents will appear here once added through the backend.</p>
+        <div className="wanted-poster rounded-3xl p-12 text-center shadow-md">
+          <div className="text-4xl mb-3">📜</div>
+          <h2 className="text-xl font-black text-[#2D2415] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>No Documents Loaded Yet</h2>
+          <p className="text-[#4A3F28] text-sm font-medium">Verified document filings will appear here as court proceedings advance.</p>
         </div>
       ) : (
         <div className="space-y-6">
           {documents.map((doc: any) => (
-            <div key={doc.id} className="rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
+            <div key={doc.id} className="wanted-poster group rounded-3xl p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-red/10">
-                  <svg className="h-6 w-6 text-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                  </svg>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#3D331E] border-2 border-gold text-gold font-black text-xl shadow-md">
+                  📜
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-bold text-primary">{doc.title}</h2>
-                  {doc.description && (
-                    <p className="mt-1 text-sm leading-relaxed text-muted">{doc.description}</p>
-                  )}
-                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     {doc.file_type && (
-                      <span className="inline-flex items-center rounded-full bg-background px-2.5 py-0.5 font-medium uppercase tracking-wider">
+                      <span className="rounded-md bg-red px-3 py-0.5 text-xs font-black text-white uppercase tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
                         {doc.file_type}
                       </span>
                     )}
                     {doc.published_at && (
-                      <span>
+                      <span className="text-xs text-[#8D7B50] font-mono font-bold">
                         {new Date(doc.published_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </span>
                     )}
                   </div>
+
+                  <h2 className="text-xl sm:text-2xl font-black text-[#2D2415] group-hover:text-red transition-colors">{doc.title}</h2>
+                  
+                  {doc.description && (
+                    <p className="mt-2 text-sm leading-relaxed text-[#4A3F28] font-medium">{doc.description}</p>
+                  )}
+
                   {doc.file_url && (
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-red hover:underline"
-                    >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                      </svg>
-                      View Document
-                    </a>
+                    <div className="mt-5 pt-3 border-t-2 border-[#8D7B50]/40 flex items-center justify-between">
+                      <span className="text-xs font-mono font-bold text-[#8D7B50]">PRIMARY COURT FILING</span>
+                      <a
+                        href={doc.file_url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 rounded-xl bg-[#3D331E] px-4 py-2 text-xs font-black uppercase tracking-wider text-gold hover:bg-red hover:text-white transition-colors shadow-sm"
+                        style={{ fontFamily: 'var(--font-heading)' }}
+                      >
+                        <span>VIEW DOCUMENT EXHIBIT</span>
+                        <span>&rarr;</span>
+                      </a>
+                    </div>
                   )}
                 </div>
               </div>
@@ -80,8 +96,10 @@ export default async function DocumentsPage() {
         </div>
       )}
 
-      <div className="mt-10">
-        <Link href="/" className="inline-flex items-center text-sm font-bold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>&larr; BACK TO HOME</Link>
+      <div className="pt-6 border-t-2 border-[#8D7B50]/40">
+        <Link href="/" className="inline-flex items-center text-xs font-black uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>
+          &larr; BACK TO HOME
+        </Link>
       </div>
     </div>
   )

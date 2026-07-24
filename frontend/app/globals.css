@@ -4,17 +4,39 @@
 
 @layer base {
   :root {
-    --color-border: #E8D5A3;
+    --color-border: #8D7B50;
     --color-primary: #1A1A2E;
+    --color-[#FFFDF5]: #FDF6E2;
   }
 
   html {
     scroll-behavior: smooth;
+    background-color: #F8F3E3;
   }
 
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #F8F3E3;
+    color: #2D2415;
+    background-image: radial-gradient(#8D7B5018 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), sans-serif;
+    letter-spacing: 0.05em;
+    color: #2D2415;
+  }
+
+  /* Universal Perfect Button & Action Element Alignment */
+  button, .btn, a[role="button"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
   }
 
   ::selection {
@@ -41,7 +63,7 @@
     max-width: 75ch;
     line-height: 1.85;
     font-size: 1.125rem;
-    color: #1A1A2E;
+    color: #2D2415;
   }
   .prose-content p {
     margin-bottom: 1.75rem;
@@ -55,64 +77,152 @@
     margin-right: 0.25em;
     margin-top: 0.05em;
     color: #D32F2F;
-    font-weight: 700;
+    font-weight: 900;
   }
   .prose-content a {
-    color: #1565C0;
+    color: #D32F2F;
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-thickness: 1.5px;
     transition: color 0.15s ease;
   }
   .prose-content a:hover {
-    color: #D32F2F;
+    color: #F5C518;
   }
   .prose-content h2 {
     font-family: var(--font-heading), sans-serif;
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     margin-top: 2.75rem;
     margin-bottom: 1rem;
     padding-top: 1.75rem;
-    border-top: 1px solid var(--color-border);
-    color: var(--color-primary);
+    border-top: 2px solid #8D7B50/40;
+    color: #2D2415;
   }
   .prose-content blockquote {
     border-left: 4px solid #D32F2F;
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(253, 246, 226, 0.8);
     padding: 1rem 1.25rem;
     margin: 1.75rem 0;
     border-radius: 0 0.5rem 0.5rem 0;
     font-style: italic;
-    color: #555;
-  }
-  .prose-content ul, .prose-content ol {
-    margin-bottom: 1.75rem;
-    padding-left: 1.5rem;
-  }
-  .prose-content ul {
-    list-style-type: disc;
-  }
-  .prose-content ol {
-    list-style-type: decimal;
-  }
-  .prose-content li {
-    margin-bottom: 0.5rem;
+    color: #4A3F28;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: #F8F3E3;
   }
   ::-webkit-scrollbar-thumb {
-    background: #D32F2F40;
-    border-radius: 3px;
+    background: #8D7B50;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #D32F2F80;
+    background: #D32F2F;
   }
 
+/* ── One Piece & Wanted Poster Styling ───────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes floatUpFade {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  50% { opacity: 0.9; transform: translateY(-24px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-44px) scale(0.9); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
+}
+
+@keyframes hakiPulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 197, 24, 0.8), 0 0 0 0 rgba(211, 47, 47, 0.6); }
+  50% { box-shadow: 0 0 35px 15px rgba(245, 197, 24, 0.4), 0 0 60px 30px rgba(211, 47, 47, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 197, 24, 0), 0 0 0 0 rgba(211, 47, 47, 0); }
+}
+
+@keyframes compassSpin {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes drumPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.85; filter: drop-shadow(0 0 12px #F5C518); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-float-up {
+  animation: floatUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.haki-pulse-trigger {
+  animation: hakiPulse 1.2s ease-out forwards;
+}
+
+.compass-needle {
+  animation: compassSpin 4s ease-in-out infinite;
+}
+
+.drum-beat {
+  animation: drumPulse 0.8s ease-in-out infinite;
+}
+
+.pulse-red-glow {
+  animation: pulseGlow 2.5s infinite;
+}
+
+/* Wanted Poster One Piece Theme */
+.wanted-poster {
+  background: linear-gradient(145deg, #FDF6E2 0%, #F5E6C4 100%);
+  border: 4px solid #8D7B50;
+  box-shadow: 0 8px 0 #5C4F30, 0 12px 24px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+
+.wanted-poster::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 2px dashed #CBB682;
+  pointer-events: none;
+}
+
+.wanted-stamp {
+  transform: rotate(-7deg);
+  border: 3px solid #D32F2F;
+  color: #D32F2F;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+}
+
+.protest-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.protest-card-hover:hover {
+  transform: translateY(-3px);
+  border-color: #F5C518;
+  box-shadow: 0 12px 30px -5px rgba(245, 197, 24, 0.2), 0 8px 10px -6px rgba(211, 47, 47, 0.1);
+}

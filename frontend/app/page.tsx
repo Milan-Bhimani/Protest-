@@ -1,4 +1,8 @@
 import Link from 'next/link'
+import SolidarityCounter from '../components/SolidarityCounter'
+import ProtestDemandsTracker from '../components/ProtestDemandsTracker'
+import LogPoseNavigator from '../components/LogPoseNavigator'
+import OnePieceBountyCard from '../components/OnePieceBountyCard'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,188 +28,175 @@ async function getStats() {
 
 export default async function Home() {
   const [articles, stats] = await Promise.all([getArticles(), getStats()])
-  const featured = articles?.[0]
-  const latest = articles?.slice(1, 4) || []
+  const bountyArticles = articles?.slice(0, 8) || []
 
   return (
-    <div>
-      <section className="rounded-2xl border border-border bg-surface p-8 sm:p-12">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-red" style={{ fontFamily: 'var(--font-heading)' }}>THE FIGHT FOR FREEDOM</p>
-        <h1 className="text-4xl font-bold uppercase tracking-wide text-primary sm:text-5xl lg:text-6xl" style={{ fontFamily: 'var(--font-heading)' }}>
-          The NEET Paper Leak &amp; Jantar Mantar Protests
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-          An independent, non-partisan information platform documenting the NEET-UG 2026 paper leak controversy, the student-led protests at Jantar Mantar, and the broader calls for accountability in India&apos;s examination system. We stand with students seeking transparency and justice.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <a href="/timeline" className="inline-flex items-center rounded-lg bg-red px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-red/90" style={{ fontFamily: 'var(--font-heading)' }}>
-            View Timeline
-          </a>
-          <a href="/documents" className="inline-flex items-center rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text transition-colors hover:bg-background hover:text-red" style={{ fontFamily: 'var(--font-heading)' }}>
-            BROWSE DOCUMENTS
-          </a>
-          <a href="/student-stories" className="inline-flex items-center rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-text transition-colors hover:bg-background hover:text-red" style={{ fontFamily: 'var(--font-heading)' }}>
-            STUDENT VOICES
-          </a>
+    <div className="space-y-16 text-center">
+      {/* Gen-Z & One Piece Bounty Poster Hero Section */}
+      <section className="wanted-poster relative rounded-3xl p-8 sm:p-12 overflow-hidden shadow-2xl text-center flex flex-col items-center justify-center">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-gold/30 blur-3xl pointer-events-none" />
+        
+        <div className="relative z-10 text-center flex flex-col items-center justify-center max-w-4xl mx-auto">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-4 text-center">
+            <span className="inline-flex items-center justify-center text-center gap-1.5 rounded-full bg-red px-3.5 py-1 text-xs font-black uppercase tracking-wider text-white shadow-md" style={{ fontFamily: 'var(--font-heading)' }}>
+              <span>🏴‍☠️</span> STRAW HAT PRESS • FREEDOM HQ
+            </span>
+            <span className="inline-flex items-center justify-center text-center rounded-full border-2 border-[#8D7B50] bg-[#3D331E] px-3.5 py-1 text-xs font-black text-gold uppercase tracking-wider shadow-sm" style={{ fontFamily: 'var(--font-heading)' }}>
+              ⚡ GEAR 5 DEMANDS FOR EXAM INTEGRITY
+            </span>
+          </div>
+
+          <h1 className="text-4xl font-black uppercase tracking-tight text-[#2D2415] sm:text-6xl lg:text-7xl leading-[0.95] text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+            TRUTH, MERIT &amp; <span className="text-red underline decoration-gold underline-offset-8">THE WILL OF D.</span>
+          </h1>
+
+          <p className="mt-6 max-w-3xl text-lg sm:text-xl leading-relaxed text-[#4A3F28] font-medium text-center mx-auto">
+            The world&apos;s premier student-driven, non-partisan press platform documenting the NEET-UG paper leak controversy. Standing firm like the Straw Hat Pirates against exam corruption, unverified rumors, and institutional negligence.
+          </p>
+
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-4 text-center">
+            <a
+              href="/timeline"
+              className="inline-flex items-center justify-center text-center gap-2 rounded-2xl bg-red px-6 py-3.5 text-sm font-black uppercase tracking-wider text-white transition-all hover:bg-red/90 shadow-xl hover:-translate-y-0.5"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              <span>🧭</span>
+              <span>LOG POSE TIMELINE</span>
+            </a>
+            <a
+              href="/student-stories"
+              className="inline-flex items-center justify-center text-center gap-2 rounded-2xl border-2 border-[#3D331E] bg-[#3D331E] px-6 py-3.5 text-sm font-black uppercase tracking-wider text-gold transition-all hover:bg-[#3D331E]/90 shadow-xl hover:-translate-y-0.5"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              <span>🗣️</span>
+              <span>STUDENT VOICES</span>
+            </a>
+            <a
+              href="/documents"
+              className="inline-flex items-center justify-center text-center gap-2 rounded-2xl border-2 border-[#8D7B50] bg-surface px-6 py-3.5 text-sm font-black uppercase tracking-wider text-[#2D2415] transition-all hover:border-red hover:text-red hover:-translate-y-0.5 shadow-md"
+              style={{ fontFamily: 'var(--font-heading)' }}
+            >
+              <span>📜</span>
+              <span>WANTED EVIDENCE</span>
+            </a>
+          </div>
         </div>
       </section>
 
+      {/* Log Pose Navigation Bar */}
+      <LogPoseNavigator />
+
+      {/* Key Metrics Grid */}
       {stats && (
-        <section className="mt-12" aria-label="Platform and Examination statistics">
-          <h2 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-red" style={{ fontFamily: 'var(--font-heading)' }}>KEY CONTROVERSY &amp; PROTEST METRICS</h2>
+        <section aria-label="Platform and Examination statistics" className="text-center">
+          <div className="flex flex-col items-center justify-center text-center mb-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-red flex items-center justify-center gap-2 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+              <span className="h-2.5 w-2.5 rounded-full bg-red animate-pulse" />
+              GRAND LINE CONTROVERSY METRICS
+            </h2>
+            <span className="text-xs text-[#8D7B50] font-mono font-bold mt-1 text-center">VERIFIED LOGS</span>
+          </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            <StatCard label="Aspirants Affected" value={stats.total_candidates || "23.3 Lakhs"} />
-            <StatCard label="Perfect Scores (720)" value={stats.perfect_scores || 67} />
-            <StatCard label="Re-Test Candidates" value={stats.retest_candidates || 1563} />
-            <StatCard label="CBI Arrests Made" value={stats.cbi_arrests || 13} />
-            <StatCard label="Days of Protest" value={`${stats.days_of_protest} Days`} />
-            <StatCard label="Verified Coverage" value={stats.total_articles} />
+            <StatCard label="Aspirants Affected" value={stats.total_candidates || "23.3 Lakhs"} tag="Aspirants" />
+            <StatCard label="Perfect Scores (720)" value={stats.perfect_scores || 67} tag="Anomaly" />
+            <StatCard label="Re-Test Candidates" value={stats.retest_candidates || 1563} tag="NTA Order" />
+            <StatCard label="CBI Arrests Made" value={stats.cbi_arrests || 13} tag="Patna Module" />
+            <StatCard label="Days of Protest" value={`${stats.days_of_protest || 49} Days`} tag="Jantar Mantar" />
+            <StatCard label="Verified Reports" value={stats.total_articles || 106} tag="Press Log" />
           </div>
         </section>
       )}
 
-      {featured && (
-        <section className="mt-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold uppercase tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>FEATURED ANALYSIS</h2>
-            <a href="/articles" className="text-sm font-semibold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>VIEW ALL &rarr;</a>
-          </div>
-          <div className="group rounded-2xl border border-border bg-surface overflow-hidden transition-all hover:border-red hover:shadow-sm">
-            {featured.image_url && (
-              <Link href={`/articles/${featured.id}`} className="aspect-video w-full overflow-hidden bg-background block">
-                <img src={featured.image_url} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
-              </Link>
-            )}
-            <div className="p-8">
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="inline-flex items-center rounded-full bg-red/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red" style={{ fontFamily: 'var(--font-heading)' }}>
-                  {featured.type?.replace(/_/g, ' ')}
+      {/* Interactive Solidarity Counter */}
+      <SolidarityCounter />
+
+      {/* Interactive Student 5-Point Demands Manifesto */}
+      <ProtestDemandsTracker />
+
+      {/* 2 Lines of 4 Small Wanted Posters Grid (8 Posters Total) */}
+      {bountyArticles.length > 0 && (
+        <section className="text-center">
+          <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-b-4 border-[#8D7B50] pb-4 text-center">
+            <div className="text-center sm:text-left">
+              <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                <span className="h-2.5 w-2.5 rounded-full bg-red animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-widest text-red text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+                  PRIMARY SOURCES &amp; DISPATCHES
                 </span>
-                {featured.category && (
-                  <span className="inline-flex items-center rounded-full bg-background px-3 py-1 text-xs font-medium text-muted">
-                    {featured.category}
-                  </span>
-                )}
               </div>
-              <Link href={`/articles/${featured.id}`} className="text-2xl font-bold text-primary transition-colors hover:text-red block">{featured.title}</Link>
-              <p className="mt-3 text-base leading-relaxed text-muted">{featured.summary}</p>
-              <div className="mt-4 flex items-center justify-between">
-                {featured.published_at && (
-                  <p className="text-xs text-muted">
-                    Published {new Date(featured.published_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
-                )}
-                <Link href={`/articles/${featured.id}`} className="text-xs font-semibold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>
-                  READ MORE &rarr;
-                </Link>
-              </div>
+              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-[#2D2415] text-center sm:text-left" style={{ fontFamily: 'var(--font-heading)' }}>
+                VERIFIED INVESTIGATIONS &amp; REPORTS
+              </h2>
             </div>
+            <a href="/articles" className="inline-flex items-center justify-center text-center text-xs font-black uppercase tracking-wider text-red hover:underline gap-1" style={{ fontFamily: 'var(--font-heading)' }}>
+              VIEW ALL DISPATCHES &rarr;
+            </a>
           </div>
-        </section>
-      )}
 
-      {latest.length > 0 && (
-        <section className="mt-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold uppercase tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>LATEST UPDATES</h2>
-            <a href="/articles" className="text-sm font-semibold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>VIEW ALL &rarr;</a>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {latest.map((item: any) => (
-              <div key={item.id} className="group rounded-xl border border-border bg-surface overflow-hidden transition-all hover:border-red hover:shadow-sm">
-                {item.image_url && (
-                  <Link href={`/articles/${item.id}`} className="aspect-video w-full overflow-hidden bg-background block">
-                    <img src={item.image_url} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
-                  </Link>
-                )}
-                <div className="p-5">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className="inline-flex items-center rounded-full bg-red/10 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-red" style={{ fontFamily: 'var(--font-heading)' }}>
-                      {item.type?.replace(/_/g, ' ')}
-                    </span>
-                    {item.category && (
-                      <span className="text-xs text-muted">{item.category}</span>
-                    )}
-                  </div>
-                  <Link href={`/articles/${item.id}`} className="text-base font-bold leading-snug text-primary transition-colors hover:text-red block">{item.title}</Link>
-                  <p className="mt-2 text-sm leading-relaxed text-muted line-clamp-3">{item.summary}</p>
-                  <div className="mt-3 flex items-center justify-between">
-                    {item.published_at && (
-                      <span className="text-xs text-muted">
-                        {new Date(item.published_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </span>
-                    )}
-                    <Link href={`/articles/${item.id}`} className="text-xs font-semibold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>
-                      READ MORE &rarr;
-                    </Link>
-                  </div>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {bountyArticles.map((item: any, idx: number) => (
+              <OnePieceBountyCard
+                key={item.id}
+                id={item.id.toString()}
+                title={item.title}
+                summary={item.summary}
+                content={item.content}
+                category={item.category || 'GROUND REPORT'}
+                type={item.type || 'NEWS'}
+                imageUrl={item.image_url}
+                publishedAt={item.published_at}
+              />
             ))}
           </div>
         </section>
       )}
 
-      <section className="mt-16">
-        <h2 className="mb-6 text-2xl font-bold uppercase tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>QUICK LINKS</h2>
+      {/* Quick Navigation Cards - Wanted Poster Style */}
+      <section className="text-center">
+        <h2 className="mb-6 text-2xl sm:text-3xl font-black uppercase tracking-wide text-[#2D2415] border-b-4 border-[#8D7B50] pb-4 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+          PLATFORM MODULES
+        </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <a href="/timeline" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">TIMELINE OF EVENTS</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">Day-by-day chronology of the NEET paper leak controversy and the Jantar Mantar protests.</p>
-          </a>
-          <a href="/documents" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">OFFICIAL DOCUMENTS</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">Verified reports, government orders, court filings, and official statements.</p>
-          </a>
-          <a href="/public-reactions" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">PUBLIC REACTIONS</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">Verified statements from public figures, political leaders, and organizations.</p>
-          </a>
-          <a href="/student-stories" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">STUDENT STORIES</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">First-person accounts from students at Jantar Mantar — their voices, their demands.</p>
-          </a>
-          <a href="/faq" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">FAQ</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">Answers to common questions about the NEET paper leak and the protest movement.</p>
-          </a>
-          <a href="/about" className="group rounded-xl border border-border bg-surface p-6 transition-all hover:border-red hover:shadow-sm">
-            <h3 className="text-lg font-bold text-primary group-hover:text-red transition-colors">ABOUT THIS PLATFORM</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted">Our mission, methodology, and commitment to verified information.</p>
-          </a>
+          <QuickCard title="CHRONOLOGICAL TIMELINE" desc="Day-by-day sequence of events from exam day to Supreme Court hearings." href="/timeline" badge="TIMELINE" />
+          <QuickCard title="VERIFIED DOCUMENTS" desc="Court petitions, NTA press releases, CBI chargesheet extracts, and official notices." href="/documents" badge="EVIDENCE" />
+          <QuickCard title="PUBLIC & LEGAL REACTIONS" desc="Official statements from legal advocates, parliamentarians, and medical associations." href="/public-reactions" badge="STATEMENTS" />
+          <QuickCard title="STUDENT TESTIMONIES" desc="Unfiltered first-person accounts and experiences from protest attendees." href="/student-stories" badge="GROUND VOICES" />
+          <QuickCard title="EXAM FAQ & LEGAL RIGHTS" desc="Clear answers to candidate queries regarding re-exams, counseling, and legal options." href="/faq" badge="EXPLAINER" />
+          <QuickCard title="EDITORIAL METHODOLOGY" desc="Our commitment to 100% non-partisan verification and primary sourcing." href="/about" badge="MISSION" />
         </div>
       </section>
-
-      {articles.filter((a: any) => a.image_url).length > 0 && (
-        <section className="mt-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold uppercase tracking-wide text-primary" style={{ fontFamily: 'var(--font-heading)' }}>LIVE FROM THE GROUND</h2>
-            <a href="/articles" className="text-sm font-semibold uppercase tracking-wider text-red hover:underline" style={{ fontFamily: 'var(--font-heading)' }}>VIEW ALL &rarr;</a>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {articles.filter((a: any) => a.image_url).slice(0, 8).map((article: any) => (
-              <div key={article.id} className="group relative aspect-video rounded-lg overflow-hidden border border-border bg-background">
-                <img src={article.image_url} alt={article.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                  <span className="text-xs text-white font-medium line-clamp-2">{article.category || 'Coverage'}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-
     </div>
   )
 }
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
+function StatCard({ label, value, tag }: { label: string; value: number | string; tag: string }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5 transition-shadow hover:shadow-sm">
-      <div className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{value}</div>
-      <div className="mt-1 text-xs text-muted font-medium">{label}</div>
+    <div className="wanted-poster rounded-2xl p-5 transition-all hover:border-gold hover:shadow-lg flex flex-col items-center justify-center text-center">
+      <span className="text-[10px] font-black uppercase tracking-wider text-red mb-1 font-mono text-center">{tag}</span>
+      <div className="text-2xl font-black tracking-tight text-[#2D2415] sm:text-3xl font-mono text-center">{value}</div>
+      <div className="mt-2 text-xs text-[#4A3F28] font-bold leading-tight text-center">{label}</div>
     </div>
+  )
+}
+
+function QuickCard({ title, desc, href, badge }: { title: string; desc: string; href: string; badge: string }) {
+  return (
+    <a href={href} className="wanted-poster group rounded-2xl p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl flex flex-col items-center justify-between text-center">
+      <div className="flex flex-col items-center justify-center text-center w-full">
+        <span className="inline-block rounded-md bg-[#3D331E] border border-gold px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-gold mb-3 text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+          {badge}
+        </span>
+        <h3 className="text-base font-black text-[#2D2415] group-hover:text-red transition-colors leading-snug text-center">
+          {title}
+        </h3>
+        <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[#4A3F28] font-medium text-center">
+          {desc}
+        </p>
+      </div>
+      <div className="mt-4 pt-3 border-t border-[#8D7B50]/40 text-xs font-black uppercase tracking-wider text-red group-hover:translate-x-1 transition-transform flex items-center justify-center gap-2 w-full text-center" style={{ fontFamily: 'var(--font-heading)' }}>
+        <span>EXPLORE MODULE</span>
+        <span>&rarr;</span>
+      </div>
+    </a>
   )
 }

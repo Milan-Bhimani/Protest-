@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { linkify } from '../../lib/utils'
+import Link from 'next/link'
+import InteractiveTimelineFeed from '../../components/InteractiveTimelineFeed'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Timeline',
+  title: 'Chronological Timeline',
   description: 'Complete chronological timeline of the NEET-UG 2026 paper leak controversy and the Jantar Mantar protests.',
 }
 
@@ -30,17 +31,6 @@ async function getTimeline() {
 
 const IST = 'Asia/Kolkata' as const
 
-function formatIST(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-IN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: IST,
-  })
-}
-
 export default async function TimelinePage() {
   const [apiEvents, stats] = await Promise.all([getTimeline(), getStats()])
   const events = apiEvents || []
@@ -53,75 +43,48 @@ export default async function TimelinePage() {
   })
 
   return (
-    <div>
-      <div className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl">Timeline of Events</h1>
-        <p className="mt-2 text-muted">A chronological record of the NEET-UG 2026 paper leak controversy and the student-led Jantar Mantar protests. Sources cited for every entry.</p>
-      </div>
+    <div className="space-y-12">
+      {/* Header Banner */}
+      <div className="wanted-poster rounded-3xl p-8 sm:p-12 shadow-xl">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-red animate-pulse" />
+          <span className="text-xs font-black uppercase tracking-widest text-red" style={{ fontFamily: 'var(--font-heading)' }}>
+            LOG POSE CHRONOLOGY
+          </span>
+        </div>
+        <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wide text-[#2D2415]" style={{ fontFamily: 'var(--font-heading)' }}>
+          NEET-UG 2026 &amp; PROTEST TIMELINE
+        </h1>
+        <p className="mt-3 text-[#4A3F28] text-base sm:text-lg max-w-3xl leading-relaxed font-medium">
+          A step-by-step chronological log documenting the paper leak discovery, initial police FIRs, Supreme Court proceedings, and the ongoing Jantar Mantar student movement. Click any entry to expand its detailed log.
+        </p>
 
-      <div className="mb-8 rounded-xl border border-border bg-blue/5 p-4 text-sm text-muted">
-        <p><strong>Day {days} of the protest</strong> — Last updated: {todayStr}. This timeline is compiled from verified news reports, ground coverage by independent journalists, and official statements. Sources are listed for each event.</p>
+        <div className="mt-6 inline-flex items-center gap-3 rounded-xl border-2 border-[#8D7B50] bg-[#3D331E] px-4 py-2.5 text-xs sm:text-sm font-black text-gold shadow-md">
+          <span className="font-mono">DAY {days} OF MOVEMENT</span>
+          <span className="text-gold/40">•</span>
+          <span>Last Verified: {todayStr}</span>
+        </div>
       </div>
 
       {events.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-12 text-center">
-          <p className="text-muted">Loading timeline data...</p>
+        <div className="wanted-poster rounded-3xl p-12 text-center shadow-md">
+          <div className="text-4xl mb-3">⏱️</div>
+          <h2 className="text-xl font-black text-[#2D2415] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>Timeline Loading...</h2>
+          <p className="text-[#4A3F28] text-sm font-medium">Fetching verified chronological data from the archive.</p>
         </div>
       ) : (
-        <ol className="relative border-l border-border" role="list">
-          {events.map((event: any, idx: number) => (
-            <li key={event.id} className="mb-10 ml-8">
-              <div className="absolute -left-2.5 mt-1.5 h-5 w-5 rounded-full border-4 border-background bg-blue" />
-              <div className="rounded-xl border border-border bg-surface p-6 transition-shadow hover:shadow-sm">
-                <time className="text-sm font-medium text-blue" dateTime={event.date}>
-                  {formatIST(event.date)}
-                </time>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight text-primary">{event.title}</h2>
-                <p className="mt-2 text-base leading-relaxed text-muted">{event.description}</p>
-                {event.sources && event.sources.length > 0 && (
-                  <div className="mt-4 rounded-lg bg-background p-3">
-                    <p className="text-xs font-semibold text-muted mb-1.5 uppercase tracking-wider">Sources ({event.sources.length})</p>
-                    <ul className="space-y-1 text-xs text-muted">
-                      {event.sources.map((s: string, i: number) => (
-                        <li key={i} className="before:content-['•'] before:mr-1.5 before:text-blue text-blue/80">{linkify(s)}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
+        <InteractiveTimelineFeed events={events} />
       )}
 
-      <div className="mt-10 rounded-xl border border-border bg-surface p-6">
-        <h3 className="text-lg font-semibold text-primary">Key Demands of Protesters</h3>
-        <ul className="mt-3 space-y-2 text-sm text-muted">
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-blue">1.</span>
-            <span>Resignation of Union Education Minister <strong>Dharmendra Pradhan</strong> over alleged NEET-UG 2026 paper leak irregularities</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-blue">2.</span>
-            <span>Unconditional release of activist <strong>Sonam Wangchuk</strong> with no restriction on his movement</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-blue">3.</span>
-            <span>INR 1 crore compensation for families of all NEET aspirants who died by suicide following the paper leak</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-blue">4.</span>
-            <span>Systemic reform of examination processes to prevent future leaks and ensure transparency</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-blue">5.</span>
-            <span>Accountability for the police action on 20 July 2026 — withdrawal of all FIRs against protesters</span>
-          </li>
-        </ul>
-      </div>
-
-      <div className="mt-10">
-        <a href="/" className="inline-flex items-center text-sm text-blue hover:underline">&larr; Back to home</a>
+      {/* Back to top & Home */}
+      <div className="pt-6 border-t-2 border-[#8D7B50]/40 flex items-center justify-between">
+        <Link
+          href="/"
+          className="inline-flex items-center text-xs font-black uppercase tracking-wider text-red hover:underline"
+          style={{ fontFamily: 'var(--font-heading)' }}
+        >
+          &larr; BACK TO HOME
+        </Link>
       </div>
     </div>
   )
