@@ -70,7 +70,8 @@ async def ingest_data(
     reactions_created = 0
 
     for a in payload.articles:
-        existing = await db.execute(select(Article).where(Article.slug == a.slug))
+        slug_key = a.slug[:500]
+        existing = await db.execute(select(Article).where(Article.slug == slug_key))
         if existing.scalar_one_or_none():
             continue
 
@@ -81,7 +82,7 @@ async def ingest_data(
         )
         article = Article(
             title=a.title[:500],
-            slug=a.slug[:500],
+            slug=slug_key,
             summary=a.summary[:500],
             content=a.content,
             image_url=a.image_url,
@@ -140,7 +141,13 @@ async def ingest_data(
         db.add(reaction)
         reactions_created += 1
 
-    await db.commit()
+    from sqlalchemy.exc import IntegrityError
+
+    try:
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        raise HTTPException(status_code=400, detail=f"Database constraint error: {e}")
 
     return IngestResponse(
         articles_created=articles_created,
