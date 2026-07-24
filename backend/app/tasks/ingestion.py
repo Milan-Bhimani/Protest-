@@ -472,7 +472,7 @@ async def _fetch_tweets(client: httpx.AsyncClient) -> list[dict]:
                 if resp.status_code != 200:
                     continue
                 parsed = feedparser.parse(resp.text)
-                for entry in parsed.entries[:5]:
+                for entry in parsed.entries[:10]:
                     title = entry.get("title", "").strip()
                     link = entry.get("link", "").strip()
                     published = entry.get("published_parsed")
@@ -481,8 +481,6 @@ async def _fetch_tweets(client: httpx.AsyncClient) -> list[dict]:
                         if published
                         else datetime.now(timezone.utc).isoformat()
                     )
-                    if not _relevant(title, title):
-                        continue
                     items.append(
                         {
                             "title": title[:500],
