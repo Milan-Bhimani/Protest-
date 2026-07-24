@@ -28,11 +28,29 @@ async function getTimeline() {
   }
 }
 
+const IST = 'Asia/Kolkata' as const
+
+function formatIST(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: IST,
+  })
+}
+
 export default async function TimelinePage() {
   const [apiEvents, stats] = await Promise.all([getTimeline(), getStats()])
   const events = apiEvents || []
   const days = stats?.days_of_protest || 48
-  const todayStr = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
+  const todayStr = new Date().toLocaleDateString('en-IN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: IST,
+  })
 
   return (
     <div>
@@ -56,7 +74,7 @@ export default async function TimelinePage() {
               <div className="absolute -left-2.5 mt-1.5 h-5 w-5 rounded-full border-4 border-background bg-blue" />
               <div className="rounded-xl border border-border bg-surface p-6 transition-shadow hover:shadow-sm">
                 <time className="text-sm font-medium text-blue" dateTime={event.date}>
-                  {new Date(event.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {formatIST(event.date)}
                 </time>
                 <h2 className="mt-2 text-xl font-semibold tracking-tight text-primary">{event.title}</h2>
                 <p className="mt-2 text-base leading-relaxed text-muted">{event.description}</p>
