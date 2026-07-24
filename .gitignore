@@ -35,3 +35,4 @@ backend/data/
 .env
 .env.*
 .vercel
+.env*

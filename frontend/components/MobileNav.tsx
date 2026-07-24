@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import StrawHatLogo from './StrawHatLogo'
 
 const navLinks = [
@@ -40,7 +41,7 @@ export default function MobileNav() {
         </svg>
       </button>
 
-      {open && (
+      {open && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-50 flex sm:hidden">
           <div className="fixed inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <div className="relative ml-auto flex h-full w-64 flex-col bg-surface shadow-xl">
@@ -80,7 +81,8 @@ export default function MobileNav() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )

@@ -31,41 +31,28 @@ RSS_FEEDS = [
     {"name": "Google News — NEET UG & NTA", "url": "https://news.google.com/rss/search?q=NEET+UG+paper+leak+OR+NTA&hl=en-IN&gl=IN&ceid=IN:en"},
     {"name": "Google News — Jantar Mantar Protests", "url": "https://news.google.com/rss/search?q=Jantar+Mantar+protest+NEET&hl=en-IN&gl=IN&ceid=IN:en"},
     {"name": "Google News — Government & Ministry Statements", "url": "https://news.google.com/rss/search?q=Education+Ministry+NEET+statement&hl=en-IN&gl=IN&ceid=IN:en"},
-    # The Hindu — most credible Indian newspaper, excellent NEET coverage
-    {"name": "The Hindu", "url": "https://www.thehindu.com/news/national/feeder/default.rss"},
+    {"name": "Google News — Supreme Court & CBI", "url": "https://news.google.com/rss/search?q=Supreme+Court+NEET+CBI&hl=en-IN&gl=IN&ceid=IN:en"},
+    {"name": "Google News — Sonam Wangchuk Protest", "url": "https://news.google.com/rss/search?q=Sonam+Wangchuk+protest&hl=en-IN&gl=IN&ceid=IN:en"},
+    # The Hindu — most credible Indian newspaper
+    {"name": "The Hindu — National", "url": "https://www.thehindu.com/news/national/feeder/default.rss"},
     {"name": "The Hindu — Education", "url": "https://www.thehindu.com/education/feeder/default.rss"},
     # Indian Express — strong investigative reporting
     {"name": "Indian Express", "url": "https://indianexpress.com/feed/"},
     {"name": "Indian Express — Education", "url": "https://indianexpress.com/section/education/feed/"},
-    # NDTV — large reach, NEET protest live coverage
+    # NDTV — large reach
     {"name": "NDTV — India", "url": "https://feeds.feedburner.com/ndtvnews-india-news"},
-    {"name": "NDTV — Education", "url": "https://feeds.feedburner.com/ndtvnews-topic-education"},
     # Hindustan Times
     {"name": "Hindustan Times", "url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml"},
     {"name": "Hindustan Times — Education", "url": "https://www.hindustantimes.com/feeds/rss/education/rssfeed.xml"},
     # Times of India
     {"name": "Times of India — India", "url": "https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms"},
     {"name": "Times of India — Education", "url": "https://timesofindia.indiatimes.com/rssfeeds/913168846.cms"},
-    # The Print — independent, quality journalism
+    # Independent Outlets
     {"name": "The Print", "url": "https://theprint.in/feed/"},
-    # BBC India — international credibility
     {"name": "BBC News — India", "url": "https://feeds.bbci.co.uk/news/world/asia/india/rss.xml"},
-    # India Today
-    {"name": "India Today", "url": "https://www.indiatoday.in/rss/120"},
-    {"name": "India Today — Education", "url": "https://www.indiatoday.in/rss/129"},
-    # Deccan Herald — South India coverage
-    {"name": "Deccan Herald", "url": "https://www.deccanherald.com/rss/india.rss"},
-    # Scroll.in — strong on student and civil society stories
-    {"name": "Scroll.in", "url": "https://scroll.in/rss/all"},
-    # The Quint — multimedia, youth audience
     {"name": "The Quint", "url": "https://www.thequint.com/rss/india"},
-    # News18
     {"name": "News18", "url": "https://www.news18.com/rss/india.xml"},
-    # The Wire — independent, critical coverage
     {"name": "The Wire", "url": "https://thewire.in/rss"},
-    # Outlook India
-    {"name": "Outlook India", "url": "https://www.outlookindia.com/rss/main/magazine"},
-    # Newslaundry — media criticism and ground reporting
     {"name": "Newslaundry", "url": "https://www.newslaundry.com/feed"},
 ]
 
@@ -286,11 +273,94 @@ async def _fetch_wikipedia_summary(title: str, client: httpx.AsyncClient) -> dic
     return None
 
 
+async def _fetch_rajmandal_news(client: httpx.AsyncClient) -> list[dict]:
+    """Fetch live news stories directly from therajmandal.in."""
+    items = []
+    try:
+        url = "https://therajmandal.in"
+        resp = await client.get(url, timeout=15)
+        if resp.status_code != 200:
+            return items
+
+        soup = BeautifulSoup(resp.text, "lxml")
+        links = soup.find_all("a", href=True)
+        article_slugs = set()
+        for l in links:
+            href = l["href"]
+            if href.startswith("/article/"):
+                slug = href.split("/article/")[1].strip("/")
+                if slug:
+                    article_slugs.add(slug)
+
+        async def _fetch_article(slug: str) -> dict | None:
+            art_url = f"https://therajmandal.in/article/{slug}"
+            try:
+                r = await client.get(art_url, timeout=12)
+                if r.status_code != 200:
+                    return None
+                
+                art_soup = BeautifulSoup(r.text, "lxml")
+                
+                headline = None
+                description = None
+                date_pub = None
+                
+                script_tag = art_soup.find("script", {"type": "application/ld+json"})
+                if script_tag and script_tag.string:
+                    try:
+                        import json
+                        data = json.loads(script_tag.string)
+                        headline = data.get("headline")
+                        description = data.get("description")
+                        date_pub = data.get("datePublished")
+                    except Exception:
+                        pass
+                
+                if not headline:
+                    h1 = art_soup.find("h1")
+                    headline = h1.get_text(strip=True) if h1 else slug.replace("-", " ").title()
+                
+                ps = art_soup.find_all("p")
+                paragraphs = [p.get_text(strip=True) for p in ps if len(p.get_text(strip=True)) > 30]
+                content = "\n\n".join(paragraphs) if paragraphs else (description or headline)
+
+                og_img = art_soup.find("meta", property="og:image")
+                img_url = og_img["content"] if og_img and og_img.has_attr("content") else None
+
+                if not date_pub:
+                    date_pub = datetime.now(timezone.utc).isoformat()
+
+                return {
+                    "title": headline[:500],
+                    "content": content,
+                    "url": art_url,
+                    "image_url": img_url,
+                    "published_at": date_pub,
+                    "source": "The Rajmandal",
+                }
+            except Exception as e:
+                logger.warning("Failed fetching Rajmandal article [%s]: %s", slug, e)
+                return None
+
+        sem = asyncio.Semaphore(5)
+        async def _bounded(slug):
+            async with sem:
+                return await _fetch_article(slug)
+
+        results = await asyncio.gather(*[_bounded(s) for s in article_slugs])
+        for r in results:
+            if r:
+                items.append(r)
+    except Exception as e:
+        logger.warning("Failed fetching from therajmandal.in: %s", e)
+    return items
+
+
 # ─── MAIN FETCH FUNCTION ───────────────────────────────────────────────────────
 
 async def fetch_news() -> list[dict]:
     """
-    Fetch all relevant news from RSS feeds + Wikipedia.
+    Fetch all relevant news from therajmandal.in + RSS feeds + Wikipedia.
     Returns list of normalized article dicts.
     """
     items = []
@@ -300,7 +370,11 @@ async def fetch_news() -> list[dict]:
         headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"}
     ) as client:
 
-        # 1. Fetch RSS feeds concurrently
+        # 1. Fetch live news directly from therajmandal.in
+        rajmandal_items = await _fetch_rajmandal_news(client)
+        items.extend(rajmandal_items)
+
+        # 2. Fetch RSS feeds concurrently
         async def _fetch_feed(feed: dict) -> list[dict]:
             feed_items = []
             try:
@@ -454,32 +528,39 @@ def parse_events(items: list[dict]) -> list[dict]:
         "arrest", "detained", "suicide", "hospital", "meeting",
         "rally", "sit-in", "hunger strike", "hunger fast",
         "sansad chalo", "chalo sansad", "Section 163",
-        "tear gas", "tear-gas", "crackdown",
+        "tear gas", "tear-gas", "crackdown", "supreme court",
+        "high court", "cbi", "nta", "verdict", "statement",
+        "re-exam", "counselling", "hearing", "parliament",
     ]
     events = []
+    seen_titles: set[str] = set()
     for item in items:
         text = f"{item['title']} {item['content']}".lower()
         if any(kw in text for kw in event_signals):
-            events.append({
-                "date": item["published_at"],
-                "title": item["title"][:500],
-                "description": (item["content"] or item["title"])[:2000],
-                "sources": [item["url"]],
-            })
+            title = item["title"][:500]
+            if title not in seen_titles:
+                seen_titles.add(title)
+                events.append({
+                    "date": item["published_at"],
+                    "title": title,
+                    "description": (item["content"] or item["title"])[:2000],
+                    "sources": [item["url"]],
+                })
     return events
 
 
 def parse_reactions(items: list[dict]) -> list[dict]:
     """
-    Extract public reactions attributed to named individuals.
+    Extract public reactions attributed to named individuals/organizations.
     Covers all sides — government, opposition, students, judiciary, activists.
-    No organizational bias.
     """
     reaction_map = [
-        # Government
+        # Government & Ministry
         ("narendra modi", "PM Narendra Modi", "Government"),
         ("prime minister modi", "PM Narendra Modi", "Government"),
         ("dharmendra pradhan", "Dharmendra Pradhan", "Education Minister"),
+        ("education minister", "Education Ministry", "Government"),
+        ("education ministry", "Education Ministry", "Government"),
         ("jp nadda", "JP Nadda", "Government"),
         ("jitendra singh", "Jitendra Singh", "Government"),
         ("amit shah", "Amit Shah", "Government"),
@@ -492,22 +573,27 @@ def parse_reactions(items: list[dict]) -> list[dict]:
         ("arvind kejriwal", "Arvind Kejriwal", "Opposition"),
         ("mamata", "Mamata Banerjee", "Opposition"),
         ("owaisi", "Asaduddin Owaisi", "Opposition"),
-        # Activists / Civil Society
+        # Activists & Civil Society
         ("sonam wangchuk", "Sonam Wangchuk", "Activist"),
         ("wangchuk", "Sonam Wangchuk", "Activist"),
-        # Judiciary
+        # Testing & Institutional Bodies
+        ("national testing agency", "National Testing Agency (NTA)", "Testing Body"),
+        ("nta", "National Testing Agency (NTA)", "Testing Body"),
+        # Judiciary & Law Enforcement
         ("supreme court", "Supreme Court of India", "Judiciary"),
         ("chief justice", "Chief Justice of India", "Judiciary"),
         ("high court", "Delhi High Court", "Judiciary"),
-        # CBI / Investigation
         ("cbi", "Central Bureau of Investigation", "Law Enforcement"),
+        ("delhi police", "Delhi Police", "Law Enforcement"),
         ("kulkarni", "P.V. Kulkarni (Accused)", "Accused"),
-        # Physics Wallah / Education sector
+        # Education Sector & Medical/Student Associations
         ("alakh pandey", "Alakh Pandey (Physics Wallah)", "Education Sector"),
         ("physics wallah", "Alakh Pandey (Physics Wallah)", "Education Sector"),
-        # Bar / Legal bodies
         ("supreme court bar", "Supreme Court Bar Association", "Legal Body"),
         ("scba", "Supreme Court Bar Association", "Legal Body"),
+        ("ima", "Indian Medical Association (IMA)", "Medical Body"),
+        ("student", "Student Representatives", "Student Body"),
+        ("protester", "Student Representatives", "Student Body"),
     ]
 
     reactions = []
@@ -516,8 +602,8 @@ def parse_reactions(items: list[dict]) -> list[dict]:
         text = f"{item['title']} {item['content']}".lower()
         for keyword, display_name, category in reaction_map:
             if keyword in text:
-                date_key = item["published_at"][:10]
-                key = (display_name, date_key)
+                title_sig = item["title"][:40]
+                key = (display_name, title_sig)
                 if key in seen:
                     continue
                 seen.add(key)

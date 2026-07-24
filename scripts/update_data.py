@@ -46,15 +46,17 @@ async def main():
         return
 
     articles = parse_articles(items)
+    events = parse_events(items)
     reactions = parse_reactions(items)
 
     print("\n[2/4] Parsed data:")
-    print(f"       Articles: {len(articles)}")
+    print(f"       Articles:  {len(articles)}")
+    print(f"       Events:    {len(events)}")
     print(f"       Reactions: {len(reactions)}")
 
     payload = {
         "articles": articles,
-        "events": [],
+        "events": events,
         "reactions": reactions,
     }
 

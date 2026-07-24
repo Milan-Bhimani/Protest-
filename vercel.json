@@ -1,20 +1,3 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rootDirectory": "frontend",
-  "services": {
-    "strawhatpress-backend": {
-      "root": "backend",
-      "entrypoint": "main:app",
-      "buildCommand": "pip install -r requirements.txt"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "strawhatpress-backend"
-      }
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
