@@ -47,11 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="border-b border-border bg-red/5 px-4 py-2 text-center text-xs text-muted leading-relaxed sm:text-sm">
           &ldquo;Democracy has four pillars: <strong className="text-red">Youth</strong>, Media, Government, and Justice. But today, the youth fights for their rights while media and justice protect the government&rsquo;s mistakes.&rdquo; &mdash; Indian Constitution
         </div>
-        <header className="sticky top-0 z-40 border-b border-border bg-surface/95">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
           <div className="mx-auto flex max-w-content items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-            <a href="/" className="flex items-center gap-2.5 group">
-              <StrawHatLogo className="w-9 h-9 transition-transform duration-200 group-hover:scale-110" />
-              <span className="text-lg font-bold tracking-wide text-primary transition-colors group-hover:text-red" style={{ fontFamily: 'var(--font-heading)' }}>
+            <a href="/" className="flex items-center gap-2.5 group min-w-0">
+              <StrawHatLogo className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+              <span className="text-base sm:text-lg font-bold tracking-wide text-primary truncate transition-colors group-hover:text-red" style={{ fontFamily: 'var(--font-heading)' }}>
                 STRAW HAT PRESS
               </span>
             </a>
