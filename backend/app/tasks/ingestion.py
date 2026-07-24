@@ -429,12 +429,82 @@ async def _fetch_rajmandal_news(client: httpx.AsyncClient) -> list[dict]:
     return items
 
 
+# ─── TWITTER/X ACCOUNTS ──────────────────────────────────────────────────────────
+
+TWITTER_ACCOUNTS = [
+    "dpradhanbjp",  # Dharmendra Pradhan — Education Minister
+    "narendramodi",  # PM Narendra Modi
+    "RahulGandhi",  # Rahul Gandhi — Opposition Leader
+    "ArvindKejriwal",  # Arvind Kejriwal — Former CM Delhi
+    "MamataOfficial",  # Mamata Banerjee — CM West Bengal
+    "AsaduddinOWAISI",  # Asaduddin Owaisi — MP
+    "PMOIndia",  # PMO India
+    "PIB_India",  # Press Information Bureau
+    "DG_PIB",  # PIB Director General
+    "CBI",  # Central Bureau of Investigation
+    "mygovindia",  # MyGov India
+    "HMOIndia",  # Home Ministry
+    "MBihar",  # Manoj Bihar — Student Activist
+    "nagrikarjun",  # Newslaundry / Media
+    "sagarikaghose",  # Sagarika Ghose — Journalist
+    "the_hindu",  # The Hindu
+    "IndianExpress",  # Indian Express
+    "ndtv",  # NDTV
+]
+
+NITTER_INSTANCES = [
+    "https://nitter.net",
+    "https://nitter.1d4.us",
+    "https://nitter.kavin.rocks",
+    "https://nitter.unixfox.eu",
+]
+
+
+async def _fetch_tweets(client: httpx.AsyncClient) -> list[dict]:
+    """Fetch tweets from key Twitter/X accounts via nitter RSS (free, no API key)."""
+    items: list[dict] = []
+
+    for account in TWITTER_ACCOUNTS:
+        for base in NITTER_INSTANCES:
+            rss_url = f"{base}/{account}/rss"
+            try:
+                resp = await client.get(rss_url, timeout=10)
+                if resp.status_code != 200:
+                    continue
+                parsed = feedparser.parse(resp.text)
+                for entry in parsed.entries[:5]:
+                    title = entry.get("title", "").strip()
+                    link = entry.get("link", "").strip()
+                    published = entry.get("published_parsed")
+                    pub_date = (
+                        datetime(*published[:6], tzinfo=timezone.utc).isoformat()
+                        if published
+                        else datetime.now(timezone.utc).isoformat()
+                    )
+                    if not _relevant(title, title):
+                        continue
+                    items.append(
+                        {
+                            "title": title[:500],
+                            "content": title,
+                            "url": link,
+                            "image_url": None,
+                            "published_at": pub_date,
+                            "source": f"Twitter/X — @{account}",
+                        }
+                    )
+                break
+            except Exception:
+                continue
+    return items
+
+
 # ─── MAIN FETCH FUNCTION ───────────────────────────────────────────────────────
 
 
 async def fetch_news() -> list[dict]:
     """
-    Fetch all relevant news from therajmandal.in + RSS feeds + Wikipedia.
+    Fetch all relevant news from Twitter/X + therajmandal.in + RSS feeds + Wikipedia.
     Returns list of normalized article dicts.
     """
     items = []
@@ -444,11 +514,16 @@ async def fetch_news() -> list[dict]:
         follow_redirects=True,
         headers={"User-Agent": "Mozilla/5.0 (compatible; StudentProtestArchive/1.0)"},
     ) as client:
-        # 1. Fetch live news directly from therajmandal.in
+        # 1. Fetch tweets from Twitter/X accounts
+        tweet_items = await _fetch_tweets(client)
+        logger.info("Fetched %d relevant tweets", len(tweet_items))
+        items.extend(tweet_items)
+
+        # 2. Fetch live news directly from therajmandal.in
         rajmandal_items = await _fetch_rajmandal_news(client)
         items.extend(rajmandal_items)
 
-        # 2. Fetch RSS feeds concurrently
+        # 3. Fetch RSS feeds concurrently
         async def _fetch_feed(feed: dict) -> list[dict]:
             feed_items = []
             try:
