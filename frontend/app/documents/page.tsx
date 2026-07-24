@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Documents',
   description: 'Verified official documents, reports, government orders, court filings, and statements regarding the NEET-UG 2026 paper leak and Jantar Mantar protests.',

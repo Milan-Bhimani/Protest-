@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Student Stories',
   description: 'First-person accounts from students at the Jantar Mantar protest. Their voices, their experiences, their demands for justice.',

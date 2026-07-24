@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { linkify } from '../../../lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function getArticle(id: string) {

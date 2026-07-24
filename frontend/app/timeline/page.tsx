@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { linkify } from '../../lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Timeline',
   description: 'Complete chronological timeline of the NEET-UG 2026 paper leak controversy and the Jantar Mantar protests.',

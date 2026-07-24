@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { linkify } from '../../lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Public Reactions',
   description: 'Verified statements from public figures, political leaders, and organizations regarding the NEET paper leak and Jantar Mantar protests.',
