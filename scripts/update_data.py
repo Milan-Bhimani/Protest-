@@ -14,6 +14,7 @@ Environment variables:
 import asyncio
 import os
 import sys
+from datetime import datetime, timezone
 
 import httpx
 
@@ -48,6 +49,36 @@ def log_fail(msg: str):
     print(f"       FAIL — {msg}")
 
 
+def _safe_iso(date_str: str | None) -> str:
+    if not date_str:
+        return datetime.now(timezone.utc).isoformat()
+    try:
+        datetime.fromisoformat(date_str)
+        return date_str
+    except (ValueError, TypeError):
+        return datetime.now(timezone.utc).isoformat()
+
+
+async def _send_batch(client: httpx.AsyncClient, label: str, payload: dict) -> None:
+    """Send a batch and exit(1) on failure."""
+    print(f"       Sending {label} ({sum(len(v) for v in payload.values())} items)...")
+    resp = await client.post(
+        f"{BACKEND_URL}/api/ingest",
+        json=payload,
+        headers={"X-API-Key": INGESTION_KEY},
+    )
+    print(f"       HTTP {resp.status_code}")
+    print(f"       Response body: {resp.text[:2000]}")
+
+    if resp.status_code != 200:
+        log_fail(f"{label} rejected — {resp.status_code} {resp.text[:500]}")
+        sys.exit(1)
+
+    result = resp.json()
+    created = ", ".join(f"{k}: {v}" for k, v in result.items() if str(v) != "0")
+    log_ok(f"{label} → {created}")
+
+
 async def main():
     print("=" * 55)
     print("  STRAW HAT PRESS — Data Update Script")
@@ -79,43 +110,32 @@ async def main():
         f"Parsed {len(articles)} articles, {len(events)} events, {len(reactions)} reactions"
     )
 
-    payload = {
-        "articles": articles,
-        "events": events,
-        "reactions": reactions,
-    }
+    for e in events:
+        e["date"] = _safe_iso(e.get("date"))
+    for r in reactions:
+        r["date"] = _safe_iso(r.get("date"))
+    for a in articles:
+        if a.get("published_at"):
+            a["published_at"] = _safe_iso(a["published_at"])
 
-    # ── 3. SEND TO BACKEND ────────────────────────────────────────────────────
-    log_step(f"Sending to backend at {BACKEND_URL}/api/ingest ...")
-    try:
-        async with httpx.AsyncClient(timeout=120) as client:
-            resp = await client.post(
-                f"{BACKEND_URL}/api/ingest",
-                json=payload,
-                headers={"X-API-Key": INGESTION_KEY},
-            )
-            print(f"       HTTP {resp.status_code}")
-            print(f"       Response body: {resp.text[:2000]}")
+    # ── 3. SEND TO BACKEND (in 3 separate requests) ──────────────────────────
+    log_step("Sending articles to backend ...")
+    async with httpx.AsyncClient(timeout=120) as client:
+        await _send_batch(
+            client, "Articles", {"articles": articles, "events": [], "reactions": []}
+        )
 
-            if resp.status_code != 200:
-                log_fail(
-                    f"Backend rejected ingest — {resp.status_code} {resp.text[:500]}"
-                )
-                sys.exit(1)
+    log_step("Sending events to backend ...")
+    async with httpx.AsyncClient(timeout=120) as client:
+        await _send_batch(
+            client, "Events", {"articles": [], "events": events, "reactions": []}
+        )
 
-            result = resp.json()
-            log_ok(
-                f"Articles created: {result.get('articles_created', '?')}  "
-                f"Events created: {result.get('events_created', '?')}  "
-                f"Reactions created: {result.get('reactions_created', '?')}"
-            )
-    except httpx.ConnectError:
-        log_fail(f"Cannot connect to backend at {BACKEND_URL}")
-        print("       Is the backend running? Check Render dashboard.")
-        sys.exit(1)
-    except httpx.TimeoutException:
-        log_fail(f"Backend at {BACKEND_URL} timed out after 120s")
-        sys.exit(1)
+    log_step("Sending reactions to backend ...")
+    async with httpx.AsyncClient(timeout=120) as client:
+        await _send_batch(
+            client, "Reactions", {"articles": [], "events": [], "reactions": reactions}
+        )
 
     # ── 4. VERIFY DATA PERSISTED ──────────────────────────────────────────────
     log_step("Verifying data via GET /api/articles ...")

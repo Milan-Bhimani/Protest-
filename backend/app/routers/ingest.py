@@ -99,9 +99,12 @@ async def ingest_data(
         if existing.scalar_one_or_none():
             continue
 
-        event_date = (
-            datetime.fromisoformat(e.date) if e.date else datetime.now(timezone.utc)
-        )
+        try:
+            event_date = (
+                datetime.fromisoformat(e.date) if e.date else datetime.now(timezone.utc)
+            )
+        except (ValueError, TypeError):
+            event_date = datetime.now(timezone.utc)
         event = Event(
             date=event_date,
             title=e.title[:500],
@@ -121,9 +124,12 @@ async def ingest_data(
         if existing.scalar_one_or_none():
             continue
 
-        reaction_date = (
-            datetime.fromisoformat(r.date) if r.date else datetime.now(timezone.utc)
-        )
+        try:
+            reaction_date = (
+                datetime.fromisoformat(r.date) if r.date else datetime.now(timezone.utc)
+            )
+        except (ValueError, TypeError):
+            reaction_date = datetime.now(timezone.utc)
         reaction = PublicReaction(
             person_name=r.person_name,
             category=r.category,
