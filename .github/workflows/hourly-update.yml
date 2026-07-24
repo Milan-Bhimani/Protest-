@@ -16,7 +16,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install httpx feedparser beautifulsoup4 lxml
+        run: pip install -r backend/requirements.txt
 
       - name: Run data update
         run: python scripts/update_data.py

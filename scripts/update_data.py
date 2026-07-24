@@ -17,9 +17,10 @@ import sys
 
 import httpx
 
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
-INGESTION_KEY = os.getenv("INGESTION_KEY", "dev-ingest-key")
-NEXTJS_URL = os.getenv("NEXTJS_URL", "http://localhost:3000")
+BACKEND_URL = os.getenv("BACKEND_URL") or "http://localhost:8000"
+INGESTION_KEY = os.getenv("INGESTION_KEY") or "dev-ingest-key"
+NEXTJS_URL = os.getenv("NEXTJS_URL") or "http://localhost:3000"
+REVALIDATION_SECRET = os.getenv("REVALIDATION_SECRET") or "dev-revalidation-secret"
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
@@ -30,29 +31,53 @@ from app.tasks.ingestion import (
     parse_reactions,
 )
 
+STEP = 0
+
+
+def log_step(msg: str):
+    global STEP
+    STEP += 1
+    print(f"\n[{STEP}/5] {msg}")
+
+
+def log_ok(msg: str):
+    print(f"       OK — {msg}")
+
+
+def log_fail(msg: str):
+    print(f"       FAIL — {msg}")
+
 
 async def main():
-    print("=" * 50)
-    print("STRAW HAT PRESS — Data Update Script")
-    print("=" * 50)
+    print("=" * 55)
+    print("  STRAW HAT PRESS — Data Update Script")
+    print(f"  BACKEND_URL={BACKEND_URL}")
+    print(f"  NEXTJS_URL={NEXTJS_URL}")
+    print("=" * 55)
 
-    print("\n[1/4] Fetching news from RSS feeds...")
-    print("       (21 feeds, filtering for NEET/protest keywords)")
+    # ── 1. FETCH ──────────────────────────────────────────────────────────────
+    log_step("Fetching news from RSS feeds...")
     items = await fetch_news()
-    print(f"       Found {len(items)} relevant articles")
-
+    print(f"       Raw relevant articles found: {len(items)}")
     if not items:
-        print("  Nothing to ingest. Try again later for fresh content.")
-        return
+        log_fail("No articles fetched from any feed — nothing to ingest.")
+        sys.exit(1)
+    log_ok(f"{len(items)} articles fetched")
 
+    # ── 2. PARSE ──────────────────────────────────────────────────────────────
+    log_step("Parsing articles, events, reactions...")
     articles = parse_articles(items)
     events = parse_events(items)
     reactions = parse_reactions(items)
-
-    print("\n[2/4] Parsed data:")
     print(f"       Articles:  {len(articles)}")
     print(f"       Events:    {len(events)}")
     print(f"       Reactions: {len(reactions)}")
+    if not articles and not events and not reactions:
+        log_fail("Parsing produced zero output — nothing to ingest.")
+        sys.exit(1)
+    log_ok(
+        f"Parsed {len(articles)} articles, {len(events)} events, {len(reactions)} reactions"
+    )
 
     payload = {
         "articles": articles,
@@ -60,64 +85,103 @@ async def main():
         "reactions": reactions,
     }
 
-    print(f"\n[3/4] Sending to backend at {BACKEND_URL}...")
+    # ── 3. SEND TO BACKEND ────────────────────────────────────────────────────
+    log_step(f"Sending to backend at {BACKEND_URL}/api/ingest ...")
     try:
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=120) as client:
             resp = await client.post(
                 f"{BACKEND_URL}/api/ingest",
                 json=payload,
                 headers={"X-API-Key": INGESTION_KEY},
             )
+            print(f"       HTTP {resp.status_code}")
+            print(f"       Response body: {resp.text[:2000]}")
 
             if resp.status_code != 200:
-                print(f"       Backend error: {resp.status_code}")
-                print(f"       Response: {resp.text[:500]}")
-                print("\n       Make sure the backend server is running on port 8000.")
-                print("       Start it with: uvicorn app.main:app --reload --port 8000")
+                log_fail(
+                    f"Backend rejected ingest — {resp.status_code} {resp.text[:500]}"
+                )
                 sys.exit(1)
 
             result = resp.json()
-            print("       Backend response:")
-            print(
-                f"         Articles created: {result['articles_created']} (skipped {len(articles) - result['articles_created']} duplicates)"
-            )
-            print(
-                f"         Events created:   {result['events_created']} (events not auto-generated from RSS)"
-            )
-            print(
-                f"         Reactions created: {result['reactions_created']} (skipped {len(reactions) - result['reactions_created']} duplicates)"
+            log_ok(
+                f"Articles created: {result.get('articles_created', '?')}  "
+                f"Events created: {result.get('events_created', '?')}  "
+                f"Reactions created: {result.get('reactions_created', '?')}"
             )
     except httpx.ConnectError:
-        print("       ERROR: Cannot connect to backend!")
-        print(f"       Make sure the backend server is running on {BACKEND_URL}")
-        print("       Start it with: uvicorn app.main:app --reload --port 8000")
+        log_fail(f"Cannot connect to backend at {BACKEND_URL}")
+        print("       Is the backend running? Check Render dashboard.")
+        sys.exit(1)
+    except httpx.TimeoutException:
+        log_fail(f"Backend at {BACKEND_URL} timed out after 120s")
         sys.exit(1)
 
-    print("\n[4/4] Triggering Next.js revalidation...")
+    # ── 4. VERIFY DATA PERSISTED ──────────────────────────────────────────────
+    log_step("Verifying data via GET /api/articles ...")
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=30) as client:
+            verify_resp = await client.get(
+                f"{BACKEND_URL}/api/articles",
+                params={"limit": 5},
+            )
+            print(f"       HTTP {verify_resp.status_code}")
+            if verify_resp.status_code == 200:
+                verify_data = verify_resp.json()
+                count = len(verify_data) if isinstance(verify_data, list) else "unknown"
+                print(f"       Articles returned by GET: {count}")
+                if isinstance(verify_data, list) and verify_data:
+                    print(
+                        f"       Latest title: {verify_data[0].get('title', 'N/A')[:80]}"
+                    )
+                log_ok("Backend returns data — ingestion confirmed")
+            else:
+                log_fail(f"GET /api/articles returned {verify_resp.status_code}")
+    except Exception as e:
+        print(f"       Warning — verify step failed (non-fatal): {e}")
+
+    # ── 5. REVALIDATE NEXT.JS CACHE ───────────────────────────────────────────
+    log_step(f"Triggering Next.js revalidation at {NEXTJS_URL}/api/revalidate ...")
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            revalidate_body = {
+                "tags": ["articles", "timeline", "reactions"],
+                "secret": REVALIDATION_SECRET,
+            }
+            print(f"       POST body: {revalidate_body}")
             resp = await client.post(
                 f"{NEXTJS_URL}/api/revalidate",
-                json={
-                    "tags": ["articles", "timeline", "reactions"],
-                    "secret": os.getenv(
-                        "REVALIDATION_SECRET", "dev-revalidation-secret"
-                    ),
-                },
+                json=revalidate_body,
             )
-            if resp.status_code == 200:
-                print("       Revalidation triggered OK")
-            else:
-                print(
-                    f"       Revalidation skipped: {resp.status_code} (frontend may not be running)"
-                )
-    except httpx.ConnectError:
-        print("       Frontend not running on 3000 — revalidation skipped")
-        print("       Start frontend with: npm run dev")
+            print(f"       HTTP {resp.status_code}")
+            print(f"       Response body: {resp.text[:1000]}")
 
-    print("\n" + "=" * 50)
-    print("Done. Refresh your browser to see updates.")
-    print("=" * 50)
+            if resp.status_code != 200:
+                log_fail(f"Revalidation failed — {resp.status_code} {resp.text[:300]}")
+                print("       This means Vercel is still serving stale cached pages.")
+                print(
+                    "       Fix: set REVALIDATION_SECRET environment variable on Vercel"
+                )
+                print("       to match the GitHub Actions secret, then redeploy.")
+                sys.exit(1)
+
+            log_ok(f"Revalidation triggered — tags: {revalidate_body['tags']}")
+    except httpx.ConnectError:
+        log_fail(f"Cannot connect to frontend at {NEXTJS_URL}")
+        print("       Is the frontend deployed on Vercel?")
+        sys.exit(1)
+    except httpx.TimeoutException:
+        log_fail(f"Frontend at {NEXTJS_URL} timed out after 30s")
+        sys.exit(1)
+
+    # ── DONE ──────────────────────────────────────────────────────────────────
+    print("\n" + "=" * 55)
+    print("  ✅ UPDATE SUCCESSFUL")
+    print(
+        f"     {len(articles)} articles, {len(events)} events, {len(reactions)} reactions"
+    )
+    print("     Revalidation OK — refresh your browser to see fresh data.")
+    print("=" * 55)
 
 
 if __name__ == "__main__":
