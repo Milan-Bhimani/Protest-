@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 STRAW HAT PRESS
               </span>
             </a>
-            <nav className="hidden items-center gap-6 text-sm sm:flex" aria-label="Main navigation">
+            <nav className="hidden items-center gap-6 text-sm md:flex" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
