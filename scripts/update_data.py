@@ -118,23 +118,33 @@ async def main():
         if a.get("published_at"):
             a["published_at"] = _safe_iso(a["published_at"])
 
-    # ── 3. SEND TO BACKEND (in 3 separate requests) ──────────────────────────
-    log_step("Sending articles to backend ...")
+    # ── 3. SEND TO BACKEND (articles in batches of 50, then events + reactions) ─
+    BATCH_SIZE = 50
     async with httpx.AsyncClient(timeout=120) as client:
-        await _send_batch(
-            client, "Articles", {"articles": articles, "events": [], "reactions": []}
-        )
+        log_step("Sending articles to backend in batches ...")
+        total_ok = 0
+        for i in range(0, len(articles), BATCH_SIZE):
+            batch = articles[i : i + BATCH_SIZE]
+            print(
+                f"       Batch {i // BATCH_SIZE + 1}/{(len(articles) + BATCH_SIZE - 1) // BATCH_SIZE} ({len(batch)} articles, start index {i})"
+            )
+            await _send_batch(
+                client,
+                f"Articles[{i}-{i + len(batch) - 1}]",
+                {"articles": batch, "events": [], "reactions": []},
+            )
+            total_ok += len(batch)
 
-    log_step("Sending events to backend ...")
-    async with httpx.AsyncClient(timeout=120) as client:
+        log_step("Sending events to backend ...")
         await _send_batch(
             client, "Events", {"articles": [], "events": events, "reactions": []}
         )
 
-    log_step("Sending reactions to backend ...")
-    async with httpx.AsyncClient(timeout=120) as client:
+        log_step("Sending reactions to backend ...")
         await _send_batch(
-            client, "Reactions", {"articles": [], "events": [], "reactions": reactions}
+            client,
+            "Reactions",
+            {"articles": [], "events": [], "reactions": reactions},
         )
 
     # ── 4. VERIFY DATA PERSISTED ──────────────────────────────────────────────
