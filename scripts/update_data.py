@@ -117,6 +117,8 @@ async def main():
     for a in articles:
         if a.get("published_at"):
             a["published_at"] = _safe_iso(a["published_at"])
+        if a.get("slug"):
+            a["slug"] = a["slug"][:500]
 
     # ── 3. SEND TO BACKEND (articles in batches of 50, then events + reactions) ─
     BATCH_SIZE = 50
